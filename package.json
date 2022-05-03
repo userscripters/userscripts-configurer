@@ -1,0 +1,60 @@
+{
+    "name": "@userscripters/userscripts-configurer",
+    "version": "0.1.0",
+    "description": "One configurer to setup them all",
+    "scripts": {
+        "test": "mocha",
+        "lint": "eslint src --fix --ext .js,.ts",
+        "clean": "rm -rf dist",
+        "prebuild": "npm run lint && npm run clean",
+        "uglify-modern": "uglifyjs dist/modern/* --compress --mangle -o dist/modern/index.min.js",
+        "uglify-legacy": "uglifyjs dist/legacy/* --compress --mangle -o dist/legacy/index.min.js",
+        "build-modern": "tsc --outDir dist/modern && npm run uglify-modern",
+        "build-legacy": "tsc --target es5 --outDir dist/legacy && npm run uglify-legacy",
+        "build-all": "bash ./scripts/build.sh",
+        "headers-tm": "bash ./scripts/headers.sh",
+        "readme": "bash ./scripts/readme.sh",
+        "postversion": "bash ./scripts/postversion.sh"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/userscripters/userscripts-configurer.git"
+    },
+    "keywords": [
+        "userscripts",
+        "stackoverflow"
+    ],
+    "author": {
+        "name": "Oleg Valter",
+        "email": "oleg.a.valter@gmail.com"
+    },
+    "contributors": [],
+    "license": "GPL-3.0-or-later",
+    "bugs": {
+        "url": "https://github.com/userscripters/userscripts-configurer/issues"
+    },
+    "homepage": "https://github.com/userscripters/userscripts-configurer#readme",
+    "devDependencies": {
+        "@types/chai": "^4.3.1",
+        "@types/chai-as-promised": "^7.1.5",
+        "@types/greasemonkey": "^4.0.2",
+        "@types/jquery": "^3.5.14",
+        "@types/mocha": "^9.1.1",
+        "@types/node": "^17.0.30",
+        "@types/tampermonkey": "^4.0.5",
+        "@typescript-eslint/eslint-plugin": "^5.21.0",
+        "@typescript-eslint/parser": "^5.21.0",
+        "@userscripters/generate-headers": "^2.12.1",
+        "@userscripters/generate-readme": "^2.3.1",
+        "@userscripters/global-types": "^0.2.4",
+        "@userscripters/stackexchange-global-types": "^2.4.1",
+        "@userscripters/storage": "^0.1.2",
+        "chai": "^4.3.6",
+        "chai-as-promised": "^7.1.1",
+        "eslint": "^8.14.0",
+        "mocha": "^10.0.0",
+        "ts-node": "^10.7.0",
+        "typescript": "^4.6.4",
+        "uglify-js": "^3.15.4"
+    }
+}
