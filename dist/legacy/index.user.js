@@ -271,8 +271,8 @@ window.addEventListener("load", function () {
             _this.options = new Map();
             return _this;
         }
-        Userscript.prototype.option = function (key, desc, type, def) {
-            this.options.set(key, { name: key, desc: desc, def: def, type: type });
+        Userscript.prototype.option = function (name, config) {
+            this.options.set(name, __assign({ name: name }, config));
             this.render();
             return this;
         };
@@ -290,17 +290,13 @@ window.addEventListener("load", function () {
             };
             var inputs = __spreadArray([], __read(options), false).map(function (_a) {
                 var _b = __read(_a, 2), key = _b[0], option = _b[1];
-                var desc = option.desc, def = option.def, _c = option.type, type = _c === void 0 ? "text" : _c;
-                var _d = __read(handlerMap[type]("".concat(scriptName, "-").concat(name, "-").concat(key), {
-                    items: [{
-                            label: desc,
-                            name: key,
-                            selected: def
-                        }],
+                var desc = option.desc, def = option.def, _c = option.items, items = _c === void 0 ? [] : _c, _d = option.type, type = _d === void 0 ? "text" : _d;
+                var _e = __read(handlerMap[type]("".concat(scriptName, "-").concat(name, "-").concat(key), {
+                    items: items.map(function (item, idx) { return (__assign(__assign({}, item), { name: item.name || "".concat(scriptName, "-").concat(name, "-").concat(key, "-item-").concat(idx) })); }),
                     description: desc,
                     title: key,
                     value: def
-                }), 1), inputWrapper = _d[0];
+                }), 1), inputWrapper = _e[0];
                 return inputWrapper;
             });
             clear(container);

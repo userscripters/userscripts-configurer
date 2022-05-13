@@ -400,16 +400,15 @@ window.addEventListener("load", () => {
             };
 
             const inputs = [...options].map(([key, option]) => {
-                const { desc, def, type = "text" } = option;
+                const { desc, def, items = [], type = "text" } = option;
 
                 const [inputWrapper] = handlerMap[type](
                     `${scriptName}-${name}-${key}`,
                     {
-                        items: [{
-                            label: desc,
-                            name: key,
-                            selected: def as boolean
-                        }],
+                        items: items.map((item, idx) => ({
+                            ...item,
+                            name: item.name || `${scriptName}-${name}-${key}-item-${idx}`
+                        })),
                         description: desc,
                         title: key,
                         value: def as string // TODO different input types

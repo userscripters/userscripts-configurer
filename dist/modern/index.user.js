@@ -216,8 +216,8 @@ window.addEventListener("load", () => {
             this.storage = storage;
             this.options = new Map();
         }
-        option(key, desc, type, def) {
-            this.options.set(key, { name: key, desc, def, type });
+        option(name, config) {
+            this.options.set(name, { name, ...config });
             this.render();
             return this;
         }
@@ -234,13 +234,12 @@ window.addEventListener("load", () => {
                 "checkbox": makeStacksCheckbox
             };
             const inputs = [...options].map(([key, option]) => {
-                const { desc, def, type = "text" } = option;
+                const { desc, def, items = [], type = "text" } = option;
                 const [inputWrapper] = handlerMap[type](`${scriptName}-${name}-${key}`, {
-                    items: [{
-                            label: desc,
-                            name: key,
-                            selected: def
-                        }],
+                    items: items.map((item, idx) => ({
+                        ...item,
+                        name: item.name || `${scriptName}-${name}-${key}-item-${idx}`
+                    })),
                     description: desc,
                     title: key,
                     value: def
