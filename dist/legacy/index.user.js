@@ -194,11 +194,11 @@ window.addEventListener("load", function () {
     };
     var makeStacksCheckbox = function (id, options) {
         var _a;
-        var _b = options.checkboxes, checkboxes = _b === void 0 ? [] : _b, _c = options.classes, classes = _c === void 0 ? [] : _c;
+        var _b = options.items, items = _b === void 0 ? [] : _b, _c = options.classes, classes = _c === void 0 ? [] : _c;
         var wrapper = document.createElement("fieldset");
         (_a = wrapper.classList).add.apply(_a, __spreadArray(["mt8"], __read(classes), false));
         wrapper.id = id;
-        var boxes = checkboxes.map(function (box) {
+        var boxes = items.map(function (box) {
             var _a = box.disabled, disabled = _a === void 0 ? false : _a, id = box.id, label = box.label, name = box.name, _b = box.selected, selected = _b === void 0 ? false : _b;
             var wrapper = document.createElement("div");
             var classList = wrapper.classList;
@@ -225,6 +225,43 @@ window.addEventListener("load", function () {
         wrapper.append.apply(wrapper, __spreadArray([], __read(boxes), false));
         return [wrapper];
     };
+    var makeStacksSelect = function (id, options) {
+        var _a;
+        var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.description, description = _c === void 0 ? "" : _c, _d = options.disabled, disabled = _d === void 0 ? false : _d, _e = options.items, items = _e === void 0 ? [] : _e, _f = options.title, title = _f === void 0 ? "" : _f;
+        var wrapper = document.createElement("div");
+        (_a = wrapper.classList).add.apply(_a, __spreadArray(["d-flex", "gs4", "gsy", "fd-column"], __read(classes), false));
+        if (title) {
+            var label = document.createElement("label");
+            label.classList.add("d-block", "s-label");
+            label.htmlFor = id;
+            label.textContent = title;
+            if (description) {
+                var desc = document.createElement("p");
+                desc.classList.add("s-description", "mt2");
+                desc.textContent = description;
+                label.append(desc);
+            }
+            wrapper.append(label);
+        }
+        var selectWrapper = document.createElement("div");
+        selectWrapper.classList.add("flex--item", "s-select");
+        var select = document.createElement("select");
+        select.id = id;
+        select.disabled = disabled;
+        var opts = items.map(function (item) {
+            var _a = item.disabled, disabled = _a === void 0 ? false : _a, label = item.label, _b = item.selected, selected = _b === void 0 ? false : _b, _c = item.value, value = _c === void 0 ? "" : _c;
+            var option = document.createElement("option");
+            option.selected = selected;
+            option.value = value;
+            option.textContent = label;
+            option.disabled = disabled;
+            return option;
+        });
+        select.append.apply(select, __spreadArray([], __read(opts), false));
+        selectWrapper.append(select);
+        wrapper.append(selectWrapper);
+        return [wrapper, select];
+    };
     var Userscript = (function (_super) {
         __extends(Userscript, _super);
         function Userscript(name, storage) {
@@ -248,13 +285,14 @@ window.addEventListener("load", function () {
             header.textContent = name;
             var handlerMap = {
                 "text": makeStacksTextInput,
+                "select": makeStacksSelect,
                 "checkbox": makeStacksCheckbox
             };
             var inputs = __spreadArray([], __read(options), false).map(function (_a) {
                 var _b = __read(_a, 2), key = _b[0], option = _b[1];
                 var desc = option.desc, def = option.def, _c = option.type, type = _c === void 0 ? "text" : _c;
                 var _d = __read(handlerMap[type]("".concat(scriptName, "-").concat(name, "-").concat(key), {
-                    checkboxes: [{
+                    items: [{
                             label: desc,
                             name: key,
                             selected: def

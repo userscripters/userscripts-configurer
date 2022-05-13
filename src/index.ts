@@ -1,4 +1,4 @@
-type UserscriptOptionType = "text" | "checkbox";
+type UserscriptOptionType = "text" | "select" | "checkbox";
 
 interface UserscriptOption {
     name: string;
@@ -44,7 +44,21 @@ interface StacksCheckboxConfig {
 }
 
 interface StacksCheckboxOptions extends StacksCommonOptions {
-    checkboxes?: StacksCheckboxConfig[];
+    items?: StacksCheckboxConfig[];
+}
+
+interface StacksSelectItem {
+    disabled?: boolean;
+    label: string;
+    selected?: boolean;
+    value?: string;
+}
+
+interface StacksSelectOptions extends StacksCommonOptions {
+    disabled?: boolean;
+    description?: string;
+    items?: StacksSelectItem[];
+    title?: string;
 }
 
 window.addEventListener("load", () => {
@@ -237,7 +251,7 @@ window.addEventListener("load", () => {
         options: StacksCheckboxOptions
     ): [HTMLFieldSetElement] => {
         const {
-            checkboxes = [],
+            items = [],
             classes = [],
         } = options;
 
@@ -245,7 +259,7 @@ window.addEventListener("load", () => {
         wrapper.classList.add("mt8", ...classes);
         wrapper.id = id;
 
-        const boxes = checkboxes.map((box) => {
+        const boxes = items.map((box) => {
             const {
                 disabled = false,
                 id,
@@ -283,6 +297,73 @@ window.addEventListener("load", () => {
 
         wrapper.append(...boxes);
         return [wrapper];
+    };
+
+    /**
+     * @see https://stackoverflow.design/product/components/checkbox/
+     *
+     * @param id select id
+     * @param options configuration options
+     */
+    const makeStacksSelect = (
+        id: string,
+        options: StacksSelectOptions,
+    ): [HTMLDivElement, HTMLSelectElement] => {
+        const {
+            classes = [],
+            description = "",
+            disabled = false,
+            items = [],
+            title = ""
+        } = options;
+
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("d-flex", "gs4", "gsy", "fd-column", ...classes);
+
+        if (title) {
+            const label = document.createElement("label");
+            label.classList.add("d-block", "s-label");
+            label.htmlFor = id;
+            label.textContent = title;
+
+            if (description) {
+                const desc = document.createElement("p");
+                desc.classList.add("s-description", "mt2");
+                desc.textContent = description;
+                label.append(desc);
+            }
+
+            wrapper.append(label);
+        }
+
+        const selectWrapper = document.createElement("div");
+        selectWrapper.classList.add("flex--item", "s-select");
+
+        const select = document.createElement("select");
+        select.id = id;
+        select.disabled = disabled;
+
+        const opts = items.map((item) => {
+            const {
+                disabled = false,
+                label,
+                selected = false,
+                value = ""
+            } = item;
+
+            const option = document.createElement("option");
+            option.selected = selected;
+            option.value = value;
+            option.textContent = label;
+            option.disabled = disabled;
+
+            return option;
+        });
+
+        select.append(...opts);
+        selectWrapper.append(select);
+        wrapper.append(selectWrapper);
+        return [wrapper, select];
     };
 
     class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store?.default {
@@ -325,6 +406,7 @@ window.addEventListener("load", () => {
 
             const handlerMap = {
                 "text": makeStacksTextInput,
+                "select": makeStacksSelect,
                 "checkbox": makeStacksCheckbox
             };
 
@@ -334,7 +416,7 @@ window.addEventListener("load", () => {
                 const [inputWrapper] = handlerMap[type](
                     `${scriptName}-${name}-${key}`,
                     {
-                        checkboxes: [{
+                        items: [{
                             label: desc,
                             name: key,
                             selected: def as boolean
