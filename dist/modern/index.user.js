@@ -66,6 +66,9 @@ window.addEventListener("load", async () => {
             `.${scriptName}-userscript-toast {
                 top: 20vh;
                 left: unset;
+            }`,
+            `.${scriptName}-userscript-option:last-child {
+                margin-bottom: 0 !important;
             }`
         ];
         rules.forEach((rule) => sheet.insertRule(rule));
@@ -149,7 +152,7 @@ window.addEventListener("load", async () => {
     const makeStacksCheckbox = (id, options) => {
         const { items = [], classes = [], } = options;
         const wrapper = document.createElement("fieldset");
-        wrapper.classList.add("mt8", ...classes);
+        wrapper.classList.add(...classes);
         wrapper.id = id;
         const boxes = items.map((box) => {
             const { disabled = false, id, label, name, selected = false, value = "" } = box;
@@ -319,6 +322,7 @@ window.addEventListener("load", async () => {
                 const isArr = Array.isArray(values);
                 const inputName = `${scriptName}-${userscriptName}-${key}`;
                 const options = {
+                    classes: [`${scriptName}-userscript-option`, "mb12"],
                     items: items.map((item, idx) => {
                         const { value, name, selected, ...rest } = item;
                         return {
@@ -352,7 +356,7 @@ window.addEventListener("load", async () => {
                 });
                 return inputWrapper;
             });
-            this.toast || (this.toast = makeStacksToast(`${scriptName}-toast`, `Updated ${name} config`, {
+            this.toast || (this.toast = makeStacksToast(`${scriptName}-toast`, `Updated ${scriptName} config`, {
                 classes: [
                     `${scriptName}-userscript-toast`,
                     "wmn3", "r0", "jc-end"

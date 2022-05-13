@@ -103,6 +103,9 @@ window.addEventListener("load", async () => {
             `.${scriptName}-userscript-toast {
                 top: 20vh;
                 left: unset;
+            }`,
+            `.${scriptName}-userscript-option:last-child {
+                margin-bottom: 0 !important;
             }`
         ];
 
@@ -272,7 +275,7 @@ window.addEventListener("load", async () => {
         } = options;
 
         const wrapper = document.createElement("fieldset");
-        wrapper.classList.add("mt8", ...classes);
+        wrapper.classList.add(...classes);
         wrapper.id = id;
 
         const boxes = items.map((box) => {
@@ -576,6 +579,7 @@ window.addEventListener("load", async () => {
                 const inputName = `${scriptName}-${userscriptName}-${key}`;
 
                 const options: StacksSelectOptions & StacksTextInputOptions & StacksCheckboxOptions = {
+                    classes: [`${scriptName}-userscript-option`, "mb12"],
                     items: items.map((item, idx) => {
                         const { value, name, selected, ...rest } = item;
 
@@ -620,7 +624,7 @@ window.addEventListener("load", async () => {
 
             this.toast ||= makeStacksToast(
                 `${scriptName}-toast`,
-                `Updated ${name} config`,
+                `Updated ${scriptName} config`,
                 {
                     classes: [
                         `${scriptName}-userscript-toast`,

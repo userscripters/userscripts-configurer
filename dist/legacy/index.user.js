@@ -159,7 +159,8 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         ".".concat(scriptName, "-modal {\n                top: 20vh;\n            }"),
                         ".".concat(scriptName, "-modal > .s-expandable--content:empty::after {\n                content: 'No userscripts to configure';\n            }"),
                         ".".concat(scriptName, "-userscript:last-child {\n                margin-bottom: var(--su2) !important;\n            }"),
-                        ".".concat(scriptName, "-userscript-toast {\n                top: 20vh;\n                left: unset;\n            }")
+                        ".".concat(scriptName, "-userscript-toast {\n                top: 20vh;\n                left: unset;\n            }"),
+                        ".".concat(scriptName, "-userscript-option:last-child {\n                margin-bottom: 0 !important;\n            }")
                     ];
                     rules.forEach(function (rule) { return sheet.insertRule(rule); });
                 };
@@ -249,7 +250,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                     var _a;
                     var _b = options.items, items = _b === void 0 ? [] : _b, _c = options.classes, classes = _c === void 0 ? [] : _c;
                     var wrapper = document.createElement("fieldset");
-                    (_a = wrapper.classList).add.apply(_a, __spreadArray(["mt8"], __read(classes), false));
+                    (_a = wrapper.classList).add.apply(_a, __spreadArray([], __read(classes), false));
                     wrapper.id = id;
                     var boxes = items.map(function (box) {
                         var _a = box.disabled, disabled = _a === void 0 ? false : _a, id = box.id, label = box.label, name = box.name, _b = box.selected, selected = _b === void 0 ? false : _b, _c = box.value, value = _c === void 0 ? "" : _c;
@@ -445,6 +446,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                             isArr = Array.isArray(values);
                                                             inputName = "".concat(scriptName, "-").concat(userscriptName, "-").concat(key);
                                                             options = {
+                                                                classes: ["".concat(scriptName, "-userscript-option"), "mb12"],
                                                                 items: items.map(function (item, idx) {
                                                                     var value = item.value, name = item.name, selected = item.selected, rest = __rest(item, ["value", "name", "selected"]);
                                                                     return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
@@ -488,7 +490,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                 });
                                             });
                                         });
-                                        this.toast || (this.toast = makeStacksToast("".concat(scriptName, "-toast"), "Updated ".concat(name, " config"), {
+                                        this.toast || (this.toast = makeStacksToast("".concat(scriptName, "-toast"), "Updated ".concat(scriptName, " config"), {
                                             classes: [
                                                 "".concat(scriptName, "-userscript-toast"),
                                                 "wmn3", "r0", "jc-end"
