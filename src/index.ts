@@ -391,6 +391,22 @@ window.addEventListener("load", () => {
             }
             return this;
         }
+
+        /**
+         * @summary unregisters a {@link Userscript}
+         * @param name userscript name
+         */
+        unregister(name: string) {
+            const { scripts } = this;
+
+            const script = scripts.get(name);
+            if (script) {
+                scripts.delete(name);
+                this.render();
+            }
+
+            return script;
+        }
     }
 
     const userscripters = unsafeWindow.UserScripters ||= {};

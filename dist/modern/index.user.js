@@ -241,6 +241,15 @@ window.addEventListener("load", () => {
             }
             return this;
         }
+        unregister(name) {
+            const { scripts } = this;
+            const script = scripts.get(name);
+            if (script) {
+                scripts.delete(name);
+                this.render();
+            }
+            return script;
+        }
     }
     const userscripters = unsafeWindow.UserScripters || (unsafeWindow.UserScripters = {});
     const userscripts = userscripters.Userscripts || (userscripters.Userscripts = {});

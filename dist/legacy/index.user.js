@@ -287,6 +287,15 @@ window.addEventListener("load", function () {
             }
             return this;
         };
+        Configurer.prototype.unregister = function (name) {
+            var scripts = this.scripts;
+            var script = scripts.get(name);
+            if (script) {
+                scripts.delete(name);
+                this.render();
+            }
+            return script;
+        };
         return Configurer;
     }());
     var userscripters = unsafeWindow.UserScripters || (unsafeWindow.UserScripters = {});
