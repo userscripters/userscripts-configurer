@@ -1,12 +1,3 @@
-type UserscriptOptionType = "text" | "select" | "checkbox";
-
-interface UserscriptOption {
-    name: string;
-    desc: string;
-    def?: unknown;
-    type: UserscriptOptionType;
-}
-
 interface StacksCommonOptions {
     classes?: string[];
     parent?: Element;
@@ -369,7 +360,7 @@ window.addEventListener("load", () => {
     class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store?.default {
 
         private container?: HTMLElement;
-        private options = new Map<string, UserscriptOption>();
+        private options = new Map<string, UserScripters.UserscriptOption>();
 
         constructor(public name: string, public storage: T) {
             super(name, storage);
@@ -377,13 +368,11 @@ window.addEventListener("load", () => {
 
         /**
          * @summary registers a {@link UserscriptOption}
-         * @param key option key
-         * @param desc option description
-         * @param type option type
-         * @param def optional default
+         * @param name option name
+         * @param config configuration options
          */
-        option(key: string, desc: string, type: UserscriptOptionType, def?: unknown) {
-            this.options.set(key, { name: key, desc, def, type });
+        option(name: string, config: Omit<UserScripters.UserscriptOption, "name">) {
+            this.options.set(name, { name, ...config });
             this.render();
             return this;
         }
