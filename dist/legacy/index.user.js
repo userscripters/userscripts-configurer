@@ -98,6 +98,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -237,7 +248,7 @@ window.addEventListener("load", function () {
         (_a = wrapper.classList).add.apply(_a, __spreadArray(["mt8"], __read(classes), false));
         wrapper.id = id;
         var boxes = items.map(function (box) {
-            var _a = box.disabled, disabled = _a === void 0 ? false : _a, id = box.id, label = box.label, name = box.name, _b = box.selected, selected = _b === void 0 ? false : _b;
+            var _a = box.disabled, disabled = _a === void 0 ? false : _a, id = box.id, label = box.label, name = box.name, _b = box.selected, selected = _b === void 0 ? false : _b, _c = box.value, value = _c === void 0 ? "" : _c;
             var wrapper = document.createElement("div");
             var classList = wrapper.classList;
             classList.add("d-flex", "gs8");
@@ -252,6 +263,7 @@ window.addEventListener("load", function () {
             input.name = name;
             input.type = "checkbox";
             input.checked = selected;
+            input.value = value;
             var labelElem = document.createElement("label");
             labelElem.classList.add("flex--item", "s-label", "fw-normal");
             labelElem.htmlFor = id || name;
@@ -379,6 +391,9 @@ window.addEventListener("load", function () {
     var isInputLike = function (elem) {
         return [HTMLInputElement, HTMLSelectElement].some(function (t) { return elem instanceof t; });
     };
+    var isCheckedBox = function (elem) {
+        return elem instanceof HTMLInputElement && elem.checked;
+    };
     var Userscript = (function (_super) {
         __extends(Userscript, _super);
         function Userscript(name, storage) {
@@ -395,17 +410,17 @@ window.addEventListener("load", function () {
         };
         Userscript.prototype.render = function () {
             return __awaiter(this, void 0, void 0, function () {
-                var _a, name, options, container, header, handlerMap, inputPromises, inputs, empty;
+                var _a, userscriptName, options, container, header, handlerMap, inputPromises, inputs, empty;
                 var _this = this;
                 return __generator(this, function (_b) {
                     switch (_b.label) {
                         case 0:
-                            _a = this, name = _a.name, options = _a.options;
+                            _a = this, userscriptName = _a.name, options = _a.options;
                             container = this.container || (this.container = document.createElement("div"));
                             container.classList.add("".concat(scriptName, "-userscript"), "d-flex", "fd-column", "mb24");
                             header = document.createElement("h2");
                             header.classList.add("mb8");
-                            header.textContent = name;
+                            header.textContent = userscriptName;
                             handlerMap = {
                                 "text": makeStacksTextInput,
                                 "select": makeStacksSelect,
@@ -414,7 +429,7 @@ window.addEventListener("load", function () {
                             inputPromises = __spreadArray([], __read(options), false).map(function (_a) {
                                 var _b = __read(_a, 2), key = _b[0], option = _b[1];
                                 return __awaiter(_this, void 0, void 0, function () {
-                                    var desc, def, _c, items, _d, type, value, _e, inputWrapper;
+                                    var desc, def, _c, items, _d, type, values, isArr, inputName, options, _e, inputWrapper;
                                     var _this = this;
                                     return __generator(this, function (_f) {
                                         switch (_f.label) {
@@ -422,15 +437,22 @@ window.addEventListener("load", function () {
                                                 desc = option.desc, def = option.def, _c = option.items, items = _c === void 0 ? [] : _c, _d = option.type, type = _d === void 0 ? "text" : _d;
                                                 return [4, this.load(key, def)];
                                             case 1:
-                                                value = _f.sent();
-                                                _e = __read(handlerMap[type]("".concat(scriptName, "-").concat(name, "-").concat(key), {
-                                                    items: items.map(function (item, idx) { return (__assign(__assign({}, item), { name: item.name || "".concat(scriptName, "-").concat(name, "-").concat(key, "-item-").concat(idx) })); }),
+                                                values = _f.sent();
+                                                isArr = Array.isArray(values);
+                                                inputName = "".concat(scriptName, "-").concat(userscriptName, "-").concat(key);
+                                                options = {
+                                                    items: items.map(function (item, idx) {
+                                                        var value = item.value, name = item.name, selected = item.selected, rest = __rest(item, ["value", "name", "selected"]);
+                                                        return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
+                                                    }),
                                                     description: desc,
                                                     title: key,
-                                                    value: value
-                                                }), 1), inputWrapper = _e[0];
+                                                };
+                                                if (!isArr)
+                                                    options.value = values;
+                                                _e = __read(handlerMap[type](inputName, options), 1), inputWrapper = _e[0];
                                                 inputWrapper.addEventListener("change", function (_a) {
-                                                    var target = _a.target;
+                                                    var currentTarget = _a.currentTarget, target = _a.target;
                                                     return __awaiter(_this, void 0, void 0, function () {
                                                         var value;
                                                         return __generator(this, function (_b) {
@@ -438,15 +460,17 @@ window.addEventListener("load", function () {
                                                                 case 0:
                                                                     if (!isInputLike(target))
                                                                         return [2];
-                                                                    value = target.value;
-                                                                    return [4, this.save(key, target.value)];
+                                                                    value = (currentTarget instanceof HTMLFieldSetElement ?
+                                                                        { value: __spreadArray([], __read(currentTarget.elements), false).filter(isCheckedBox).map(function (e) { return e.value; }) } :
+                                                                        target).value;
+                                                                    return [4, this.save(key, value)];
                                                                 case 1:
                                                                     _b.sent();
                                                                     container.dispatchEvent(new CustomEvent("".concat(scriptName, "-success"), {
                                                                         bubbles: true,
                                                                         detail: {
                                                                             key: key,
-                                                                            script: name,
+                                                                            script: scriptName,
                                                                             value: value
                                                                         }
                                                                     }));

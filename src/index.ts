@@ -51,6 +51,7 @@ interface StacksCheckboxConfig {
     label: string;
     name: string;
     selected?: boolean;
+    value?: string;
 }
 
 interface StacksCheckboxOptions extends StacksCommonOptions {
@@ -280,7 +281,8 @@ window.addEventListener("load", () => {
                 id,
                 label,
                 name,
-                selected = false
+                selected = false,
+                value = ""
             } = box;
 
             const wrapper = document.createElement("div");
@@ -299,6 +301,7 @@ window.addEventListener("load", () => {
             input.name = name;
             input.type = "checkbox";
             input.checked = selected;
+            input.value = value;
 
             const labelElem = document.createElement("label");
             labelElem.classList.add("flex--item", "s-label", "fw-normal");
@@ -516,6 +519,10 @@ window.addEventListener("load", () => {
         return [HTMLInputElement, HTMLSelectElement].some((t) => elem instanceof t);
     };
 
+    const isCheckedBox = (elem: EventTarget | null): elem is HTMLInputElement & { checked: true; } => {
+        return elem instanceof HTMLInputElement && elem.checked;
+    };
+
     class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store?.default {
 
         private container?: HTMLElement;
@@ -541,7 +548,7 @@ window.addEventListener("load", () => {
          * @summary renders the userscript item
          */
         async render() {
-            const { name, options } = this;
+            const { name: userscriptName, options } = this;
 
             const container = this.container ||= document.createElement("div");
             container.classList.add(
@@ -551,7 +558,7 @@ window.addEventListener("load", () => {
 
             const header = document.createElement("h2");
             header.classList.add("mb8");
-            header.textContent = name;
+            header.textContent = userscriptName;
 
             const handlerMap = {
                 "text": makeStacksTextInput,
@@ -562,34 +569,46 @@ window.addEventListener("load", () => {
             const inputPromises = [...options].map(async ([key, option]) => {
                 const { desc, def, items = [], type = "text" } = option;
 
-                const value = await this.load(key, def) as string;
+                const values = await this.load(key, def) as string | string[];
 
-                const [inputWrapper] = handlerMap[type](
-                    `${scriptName}-${name}-${key}`,
-                    {
-                        items: items.map((item, idx) => ({
-                            ...item,
-                            name: item.name || `${scriptName}-${name}-${key}-item-${idx}`
-                        })),
-                        description: desc,
-                        title: key,
-                        value
-                    }
-                );
+                const isArr = Array.isArray(values);
 
-                inputWrapper.addEventListener("change", async ({ target }) => {
+                const inputName = `${scriptName}-${userscriptName}-${key}`;
+
+                const options: StacksSelectOptions & StacksTextInputOptions & StacksCheckboxOptions = {
+                    items: items.map((item, idx) => {
+                        const { value, name, selected, ...rest } = item;
+
+                        return {
+                            ...rest,
+                            name: name || `${inputName}-item-${idx}`,
+                            selected: isArr && value !== void 0 ? values.includes(value) : selected,
+                            value
+                        };
+                    }),
+                    description: desc,
+                    title: key,
+                };
+
+                if (!isArr) options.value = values;
+
+                const [inputWrapper] = handlerMap[type](inputName, options);
+
+                inputWrapper.addEventListener("change", async ({ currentTarget, target }) => {
                     if (!isInputLike(target)) return;
 
-                    const { value } = target;
+                    const { value } = currentTarget instanceof HTMLFieldSetElement ?
+                        { value: [...currentTarget.elements].filter(isCheckedBox).map((e) => e.value) } :
+                        target;
 
-                    await this.save(key, target.value);
+                    await this.save(key, value);
 
                     container.dispatchEvent(
                         new CustomEvent(`${scriptName}-success`, {
                             bubbles: true,
                             detail: {
                                 key,
-                                script: name,
+                                script: scriptName,
                                 value
                             }
                         })
