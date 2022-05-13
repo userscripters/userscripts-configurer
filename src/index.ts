@@ -99,6 +99,10 @@ window.addEventListener("load", () => {
             `.${scriptName}-userscript:last-child {
                 margin-bottom: var(--su2) !important;
             }`,
+            `.${scriptName}-userscript-toast {
+                top: 20vh;
+                left: unset;
+            }`
         ];
 
         rules.forEach((rule) => sheet.insertRule(rule));
@@ -516,6 +520,7 @@ window.addEventListener("load", () => {
 
         private container?: HTMLElement;
         private options = new Map<string, UserScripters.UserscriptOption>();
+        private toast?: HTMLElement;
 
         constructor(public name: string, public storage: T) {
             super(name, storage);
@@ -574,16 +579,47 @@ window.addEventListener("load", () => {
 
                 inputWrapper.addEventListener("change", async ({ target }) => {
                     if (!isInputLike(target)) return;
+
+                    const { value } = target;
+
                     await this.save(key, target.value);
+
+                    container.dispatchEvent(
+                        new CustomEvent(`${scriptName}-success`, {
+                            bubbles: true,
+                            detail: {
+                                key,
+                                script: name,
+                                value
+                            }
+                        })
+                    );
                 });
 
                 return inputWrapper;
             });
 
+            this.toast ||= makeStacksToast(
+                `${scriptName}-toast`,
+                `Updated ${name} config`,
+                {
+                    classes: [
+                        `${scriptName}-userscript-toast`,
+                        "wmn3", "r0", "jc-end"
+                    ],
+                    type: "success"
+                }
+            );
+
+            container.addEventListener(`${scriptName}-success`, () => {
+                const { toast } = this;
+                if (toast) showToast(toast, 1);
+            });
+
             const inputs = await Promise.all(inputPromises);
 
             clear(container);
-            container.append(header, ...inputs);
+            container.append(this.toast, header, ...inputs);
 
             if (!inputs.length) {
                 const empty = document.createElement("div");

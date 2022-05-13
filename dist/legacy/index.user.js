@@ -125,6 +125,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 };
 ;
 ;
+;
 window.addEventListener("load", function () {
     var scriptName = "userscript-configurer";
     var Store = window.Store;
@@ -143,6 +144,7 @@ window.addEventListener("load", function () {
             ".".concat(scriptName, "-modal {\n                top: 20vh;\n            }"),
             ".".concat(scriptName, "-modal > .s-expandable--content:empty::after {\n                content: 'No userscripts to configure';\n            }"),
             ".".concat(scriptName, "-userscript:last-child {\n                margin-bottom: var(--su2) !important;\n            }"),
+            ".".concat(scriptName, "-userscript-toast {\n                top: 20vh;\n                left: unset;\n            }")
         ];
         rules.forEach(function (rule) { return sheet.insertRule(rule); });
     };
@@ -299,6 +301,81 @@ window.addEventListener("load", function () {
         wrapper.append(selectWrapper);
         return [wrapper, select];
     };
+    var makeStacksIcon = function (name, pathConfig, _a) {
+        var _b;
+        var _c = _a === void 0 ? {} : _a, _d = _c.classes, classes = _d === void 0 ? [] : _d, _e = _c.width, width = _e === void 0 ? 14 : _e, _f = _c.height, height = _f === void 0 ? width : _f;
+        var ns = "http://www.w3.org/2000/svg";
+        var svg = document.createElementNS(ns, "svg");
+        (_b = svg.classList).add.apply(_b, __spreadArray(["svg-icon", name], __read(classes), false));
+        svg.setAttribute("width", width.toString());
+        svg.setAttribute("height", height.toString());
+        svg.setAttribute("viewBox", "0 0 ".concat(width, " ").concat(height));
+        svg.setAttribute("aria-hidden", "true");
+        var path = document.createElementNS(ns, "path");
+        path.setAttribute("d", pathConfig);
+        svg.append(path);
+        return [svg, path];
+    };
+    var makeStacksToast = function (id, text, options) {
+        var _a, _b;
+        if (options === void 0) { options = {}; }
+        var _c = options.buttons, buttons = _c === void 0 ? [] : _c, _d = options.classes, classes = _d === void 0 ? [] : _d, _e = options.important, important = _e === void 0 ? false : _e, _f = options.msgClasses, msgClasses = _f === void 0 ? [] : _f, parent = options.parent, _g = options.type, type = _g === void 0 ? "none" : _g;
+        var wrap = document.createElement("div");
+        (_a = wrap.classList).add.apply(_a, __spreadArray(["s-toast"], __read(classes), false));
+        wrap.setAttribute("aria-hidden", "true");
+        wrap.setAttribute("role", "alertdialog");
+        wrap.setAttribute("aria-labelledby", "notice-message");
+        wrap.id = id;
+        var aside = document.createElement("aside");
+        aside.classList.add("s-notice", "p8", "pl16");
+        if (type !== "none")
+            aside.classList.add("s-notice__".concat(type));
+        if (important)
+            aside.classList.add("s-notice__important");
+        var msgWrap = document.createElement("div");
+        (_b = msgWrap.classList).add.apply(_b, __spreadArray(["d-flex",
+            "gs16",
+            "gsx",
+            "ai-center",
+            "jc-space-between"], __read(msgClasses), false));
+        var message = document.createElement("div");
+        message.classList.add("flex--item");
+        message.textContent = text;
+        var btnWrap = document.createElement("div");
+        btnWrap.classList.add("d-flex");
+        var dismissBtn = document.createElement("button");
+        dismissBtn.type = "button";
+        dismissBtn.classList.add("s-btn", "s-notice--btn");
+        dismissBtn.setAttribute("aria-label", "Dismiss");
+        buttons.push(dismissBtn);
+        var _h = __read(makeStacksIcon("iconClearSm", "M12 3.41 10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7 12 3.41z"), 1), dismissIcon = _h[0];
+        dismissBtn.append(dismissIcon);
+        btnWrap.append.apply(btnWrap, __spreadArray([], __read(buttons), false));
+        msgWrap.append(message, btnWrap);
+        aside.append(msgWrap);
+        wrap.append(aside);
+        if (parent)
+            parent.append(wrap);
+        return wrap;
+    };
+    var toggleToast = function (target, show) {
+        var toast = typeof target === "string" ? document.querySelector(target) : target;
+        if (!toast)
+            throw new ReferenceError("missing toast: ".concat(target));
+        var isShown = (toast === null || toast === void 0 ? void 0 : toast.getAttribute("aria-hidden")) !== "true";
+        toast.setAttribute("aria-hidden", (show !== void 0 ? !show : isShown).toString());
+        return toast;
+    };
+    var hideToast = function (target, hideFor) {
+        var toast = toggleToast(target, false);
+        if (hideFor)
+            setTimeout(function () { return showToast(toast); }, hideFor * 1e3);
+    };
+    var showToast = function (target, showFor) {
+        var toast = toggleToast(target, true);
+        if (showFor)
+            setTimeout(function () { return hideToast(toast); }, showFor * 1e3);
+    };
     var isInputLike = function (elem) {
         return [HTMLInputElement, HTMLSelectElement].some(function (t) { return elem instanceof t; });
     };
@@ -355,14 +432,24 @@ window.addEventListener("load", function () {
                                                 inputWrapper.addEventListener("change", function (_a) {
                                                     var target = _a.target;
                                                     return __awaiter(_this, void 0, void 0, function () {
+                                                        var value;
                                                         return __generator(this, function (_b) {
                                                             switch (_b.label) {
                                                                 case 0:
                                                                     if (!isInputLike(target))
                                                                         return [2];
+                                                                    value = target.value;
                                                                     return [4, this.save(key, target.value)];
                                                                 case 1:
                                                                     _b.sent();
+                                                                    container.dispatchEvent(new CustomEvent("".concat(scriptName, "-success"), {
+                                                                        bubbles: true,
+                                                                        detail: {
+                                                                            key: key,
+                                                                            script: name,
+                                                                            value: value
+                                                                        }
+                                                                    }));
                                                                     return [2];
                                                             }
                                                         });
@@ -373,11 +460,23 @@ window.addEventListener("load", function () {
                                     });
                                 });
                             });
+                            this.toast || (this.toast = makeStacksToast("".concat(scriptName, "-toast"), "Updated ".concat(name, " config"), {
+                                classes: [
+                                    "".concat(scriptName, "-userscript-toast"),
+                                    "wmn3", "r0", "jc-end"
+                                ],
+                                type: "success"
+                            }));
+                            container.addEventListener("".concat(scriptName, "-success"), function () {
+                                var toast = _this.toast;
+                                if (toast)
+                                    showToast(toast, 1);
+                            });
                             return [4, Promise.all(inputPromises)];
                         case 1:
                             inputs = _b.sent();
                             clear(container);
-                            container.append.apply(container, __spreadArray([header], __read(inputs), false));
+                            container.append.apply(container, __spreadArray([this.toast, header], __read(inputs), false));
                             if (!inputs.length) {
                                 empty = document.createElement("div");
                                 empty.textContent = "No configuration options available";

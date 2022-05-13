@@ -38,6 +38,7 @@
 "use strict";
 ;
 ;
+;
 window.addEventListener("load", () => {
     const scriptName = "userscript-configurer";
     const { Store } = window;
@@ -62,6 +63,10 @@ window.addEventListener("load", () => {
             `.${scriptName}-userscript:last-child {
                 margin-bottom: var(--su2) !important;
             }`,
+            `.${scriptName}-userscript-toast {
+                top: 20vh;
+                left: unset;
+            }`
         ];
         rules.forEach((rule) => sheet.insertRule(rule));
     };
@@ -210,6 +215,73 @@ window.addEventListener("load", () => {
         wrapper.append(selectWrapper);
         return [wrapper, select];
     };
+    const makeStacksIcon = (name, pathConfig, { classes = [], width = 14, height = width } = {}) => {
+        const ns = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(ns, "svg");
+        svg.classList.add("svg-icon", name, ...classes);
+        svg.setAttribute("width", width.toString());
+        svg.setAttribute("height", height.toString());
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.setAttribute("aria-hidden", "true");
+        const path = document.createElementNS(ns, "path");
+        path.setAttribute("d", pathConfig);
+        svg.append(path);
+        return [svg, path];
+    };
+    const makeStacksToast = (id, text, options = {}) => {
+        const { buttons = [], classes = [], important = false, msgClasses = [], parent, type = "none", } = options;
+        const wrap = document.createElement("div");
+        wrap.classList.add("s-toast", ...classes);
+        wrap.setAttribute("aria-hidden", "true");
+        wrap.setAttribute("role", "alertdialog");
+        wrap.setAttribute("aria-labelledby", "notice-message");
+        wrap.id = id;
+        const aside = document.createElement("aside");
+        aside.classList.add("s-notice", "p8", "pl16");
+        if (type !== "none")
+            aside.classList.add(`s-notice__${type}`);
+        if (important)
+            aside.classList.add("s-notice__important");
+        const msgWrap = document.createElement("div");
+        msgWrap.classList.add("d-flex", "gs16", "gsx", "ai-center", "jc-space-between", ...msgClasses);
+        const message = document.createElement("div");
+        message.classList.add("flex--item");
+        message.textContent = text;
+        const btnWrap = document.createElement("div");
+        btnWrap.classList.add("d-flex");
+        const dismissBtn = document.createElement("button");
+        dismissBtn.type = "button";
+        dismissBtn.classList.add("s-btn", "s-notice--btn");
+        dismissBtn.setAttribute("aria-label", "Dismiss");
+        buttons.push(dismissBtn);
+        const [dismissIcon] = makeStacksIcon("iconClearSm", "M12 3.41 10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7 12 3.41z");
+        dismissBtn.append(dismissIcon);
+        btnWrap.append(...buttons);
+        msgWrap.append(message, btnWrap);
+        aside.append(msgWrap);
+        wrap.append(aside);
+        if (parent)
+            parent.append(wrap);
+        return wrap;
+    };
+    const toggleToast = (target, show) => {
+        const toast = typeof target === "string" ? document.querySelector(target) : target;
+        if (!toast)
+            throw new ReferenceError(`missing toast: ${target}`);
+        const isShown = (toast === null || toast === void 0 ? void 0 : toast.getAttribute("aria-hidden")) !== "true";
+        toast.setAttribute("aria-hidden", (show !== void 0 ? !show : isShown).toString());
+        return toast;
+    };
+    const hideToast = (target, hideFor) => {
+        const toast = toggleToast(target, false);
+        if (hideFor)
+            setTimeout(() => showToast(toast), hideFor * 1e3);
+    };
+    const showToast = (target, showFor) => {
+        const toast = toggleToast(target, true);
+        if (showFor)
+            setTimeout(() => hideToast(toast), showFor * 1e3);
+    };
     const isInputLike = (elem) => {
         return [HTMLInputElement, HTMLSelectElement].some((t) => elem instanceof t);
     };
@@ -252,13 +324,34 @@ window.addEventListener("load", () => {
                 inputWrapper.addEventListener("change", async ({ target }) => {
                     if (!isInputLike(target))
                         return;
+                    const { value } = target;
                     await this.save(key, target.value);
+                    container.dispatchEvent(new CustomEvent(`${scriptName}-success`, {
+                        bubbles: true,
+                        detail: {
+                            key,
+                            script: name,
+                            value
+                        }
+                    }));
                 });
                 return inputWrapper;
             });
+            this.toast || (this.toast = makeStacksToast(`${scriptName}-toast`, `Updated ${name} config`, {
+                classes: [
+                    `${scriptName}-userscript-toast`,
+                    "wmn3", "r0", "jc-end"
+                ],
+                type: "success"
+            }));
+            container.addEventListener(`${scriptName}-success`, () => {
+                const { toast } = this;
+                if (toast)
+                    showToast(toast, 1);
+            });
             const inputs = await Promise.all(inputPromises);
             clear(container);
-            container.append(header, ...inputs);
+            container.append(this.toast, header, ...inputs);
             if (!inputs.length) {
                 const empty = document.createElement("div");
                 empty.textContent = "No configuration options available";
