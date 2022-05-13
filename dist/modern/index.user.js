@@ -141,6 +141,38 @@ window.addEventListener("load", () => {
         parent === null || parent === void 0 ? void 0 : parent.append(wrap);
         return [wrap, input];
     };
+    const makeStacksCheckbox = (id, options) => {
+        const { checkboxes = [], classes = [], } = options;
+        const wrapper = document.createElement("fieldset");
+        wrapper.classList.add("mt8", ...classes);
+        wrapper.id = id;
+        const boxes = checkboxes.map((box) => {
+            const { disabled = false, id, label, name, selected = false } = box;
+            const wrapper = document.createElement("div");
+            const { classList } = wrapper;
+            classList.add("d-flex", "gs8");
+            if (disabled)
+                classList.add("is-disabled");
+            const item = document.createElement("div");
+            item.classList.add("flex--item");
+            const input = document.createElement("input");
+            input.classList.add("s-checkbox");
+            input.disabled = disabled;
+            input.id = id || name;
+            input.name = name;
+            input.type = "checkbox";
+            input.checked = selected;
+            const labelElem = document.createElement("label");
+            labelElem.classList.add("flex--item", "s-label", "fw-normal");
+            labelElem.htmlFor = id || name;
+            labelElem.textContent = label;
+            item.append(input);
+            wrapper.append(item, labelElem);
+            return wrapper;
+        });
+        wrapper.append(...boxes);
+        return [wrapper];
+    };
     class Userscript extends (Store === null || Store === void 0 ? void 0 : Store.default) {
         constructor(name, storage) {
             super(name, storage);
@@ -148,8 +180,8 @@ window.addEventListener("load", () => {
             this.storage = storage;
             this.options = new Map();
         }
-        option(key, desc, def) {
-            this.options.set(key, { name: key, desc, def });
+        option(key, desc, type, def) {
+            this.options.set(key, { name: key, desc, def, type });
             this.render();
             return this;
         }
@@ -160,9 +192,18 @@ window.addEventListener("load", () => {
             const header = document.createElement("h2");
             header.classList.add("mb8");
             header.textContent = name;
+            const handlerMap = {
+                "text": makeStacksTextInput,
+                "checkbox": makeStacksCheckbox
+            };
             const inputs = [...options].map(([key, option]) => {
-                const { desc, def } = option;
-                const [inputWrapper] = makeStacksTextInput(`${scriptName}-${name}-${key}`, {
+                const { desc, def, type = "text" } = option;
+                const [inputWrapper] = handlerMap[type](`${scriptName}-${name}-${key}`, {
+                    checkboxes: [{
+                            label: desc,
+                            name: key,
+                            selected: def
+                        }],
                     description: desc,
                     title: key,
                     value: def

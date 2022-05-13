@@ -192,6 +192,39 @@ window.addEventListener("load", function () {
         parent === null || parent === void 0 ? void 0 : parent.append(wrap);
         return [wrap, input];
     };
+    var makeStacksCheckbox = function (id, options) {
+        var _a;
+        var _b = options.checkboxes, checkboxes = _b === void 0 ? [] : _b, _c = options.classes, classes = _c === void 0 ? [] : _c;
+        var wrapper = document.createElement("fieldset");
+        (_a = wrapper.classList).add.apply(_a, __spreadArray(["mt8"], __read(classes), false));
+        wrapper.id = id;
+        var boxes = checkboxes.map(function (box) {
+            var _a = box.disabled, disabled = _a === void 0 ? false : _a, id = box.id, label = box.label, name = box.name, _b = box.selected, selected = _b === void 0 ? false : _b;
+            var wrapper = document.createElement("div");
+            var classList = wrapper.classList;
+            classList.add("d-flex", "gs8");
+            if (disabled)
+                classList.add("is-disabled");
+            var item = document.createElement("div");
+            item.classList.add("flex--item");
+            var input = document.createElement("input");
+            input.classList.add("s-checkbox");
+            input.disabled = disabled;
+            input.id = id || name;
+            input.name = name;
+            input.type = "checkbox";
+            input.checked = selected;
+            var labelElem = document.createElement("label");
+            labelElem.classList.add("flex--item", "s-label", "fw-normal");
+            labelElem.htmlFor = id || name;
+            labelElem.textContent = label;
+            item.append(input);
+            wrapper.append(item, labelElem);
+            return wrapper;
+        });
+        wrapper.append.apply(wrapper, __spreadArray([], __read(boxes), false));
+        return [wrapper];
+    };
     var Userscript = (function (_super) {
         __extends(Userscript, _super);
         function Userscript(name, storage) {
@@ -201,8 +234,8 @@ window.addEventListener("load", function () {
             _this.options = new Map();
             return _this;
         }
-        Userscript.prototype.option = function (key, desc, def) {
-            this.options.set(key, { name: key, desc: desc, def: def });
+        Userscript.prototype.option = function (key, desc, type, def) {
+            this.options.set(key, { name: key, desc: desc, def: def, type: type });
             this.render();
             return this;
         };
@@ -213,14 +246,23 @@ window.addEventListener("load", function () {
             var header = document.createElement("h2");
             header.classList.add("mb8");
             header.textContent = name;
+            var handlerMap = {
+                "text": makeStacksTextInput,
+                "checkbox": makeStacksCheckbox
+            };
             var inputs = __spreadArray([], __read(options), false).map(function (_a) {
                 var _b = __read(_a, 2), key = _b[0], option = _b[1];
-                var desc = option.desc, def = option.def;
-                var _c = __read(makeStacksTextInput("".concat(scriptName, "-").concat(name, "-").concat(key), {
+                var desc = option.desc, def = option.def, _c = option.type, type = _c === void 0 ? "text" : _c;
+                var _d = __read(handlerMap[type]("".concat(scriptName, "-").concat(name, "-").concat(key), {
+                    checkboxes: [{
+                            label: desc,
+                            name: key,
+                            selected: def
+                        }],
                     description: desc,
                     title: key,
                     value: def
-                }), 1), inputWrapper = _c[0];
+                }), 1), inputWrapper = _d[0];
                 return inputWrapper;
             });
             clear(container);

@@ -298,10 +298,11 @@ window.addEventListener("load", () => {
          * @summary registers a {@link UserscriptOption}
          * @param key option key
          * @param desc option description
+         * @param type option type
          * @param def optional default
          */
-        option(key: string, desc: string, def?: unknown) {
-            this.options.set(key, { name: key, desc, def });
+        option(key: string, desc: string, type: UserscriptOptionType, def?: unknown) {
+            this.options.set(key, { name: key, desc, def, type });
             this.render();
             return this;
         }
@@ -322,12 +323,22 @@ window.addEventListener("load", () => {
             header.classList.add("mb8");
             header.textContent = name;
 
-            const inputs = [...options].map(([key, option]) => {
-                const { desc, def } = option;
+            const handlerMap = {
+                "text": makeStacksTextInput,
+                "checkbox": makeStacksCheckbox
+            };
 
-                const [inputWrapper] = makeStacksTextInput(
+            const inputs = [...options].map(([key, option]) => {
+                const { desc, def, type = "text" } = option;
+
+                const [inputWrapper] = handlerMap[type](
                     `${scriptName}-${name}-${key}`,
                     {
+                        checkboxes: [{
+                            label: desc,
+                            name: key,
+                            selected: def as boolean
+                        }],
                         description: desc,
                         title: key,
                         value: def as string // TODO different input types
