@@ -1,7 +1,10 @@
+type UserscriptOptionType = "text" | "checkbox";
+
 interface UserscriptOption {
     name: string;
     desc: string;
     def?: unknown;
+    type: UserscriptOptionType;
 }
 
 interface StacksCommonOptions {
@@ -31,6 +34,18 @@ interface StacksTextInputOptions extends StacksCommonOptions {
     title?: string;
     value?: string;
 };
+
+interface StacksCheckboxConfig {
+    disabled?: boolean;
+    id?: string;
+    label: string;
+    name: string;
+    selected?: boolean;
+}
+
+interface StacksCheckboxOptions extends StacksCommonOptions {
+    checkboxes?: StacksCheckboxConfig[];
+}
 
 window.addEventListener("load", () => {
     const scriptName = "userscript-configurer";
@@ -210,6 +225,64 @@ window.addEventListener("load", () => {
 
         parent?.append(wrap);
         return [wrap, input];
+    };
+
+    /**
+     * @see https://stackoverflow.design/product/components/checkbox/
+     * @param id id of the checkbox container
+     * @param options configuration options
+     */
+    const makeStacksCheckbox = (
+        id: string,
+        options: StacksCheckboxOptions
+    ): [HTMLFieldSetElement] => {
+        const {
+            checkboxes = [],
+            classes = [],
+        } = options;
+
+        const wrapper = document.createElement("fieldset");
+        wrapper.classList.add("mt8", ...classes);
+        wrapper.id = id;
+
+        const boxes = checkboxes.map((box) => {
+            const {
+                disabled = false,
+                id,
+                label,
+                name,
+                selected = false
+            } = box;
+
+            const wrapper = document.createElement("div");
+            const { classList } = wrapper;
+            classList.add("d-flex", "gs8");
+
+            if (disabled) classList.add("is-disabled");
+
+            const item = document.createElement("div");
+            item.classList.add("flex--item");
+
+            const input = document.createElement("input");
+            input.classList.add("s-checkbox");
+            input.disabled = disabled;
+            input.id = id || name;
+            input.name = name;
+            input.type = "checkbox";
+            input.checked = selected;
+
+            const labelElem = document.createElement("label");
+            labelElem.classList.add("flex--item", "s-label", "fw-normal");
+            labelElem.htmlFor = id || name;
+            labelElem.textContent = label;
+
+            item.append(input);
+            wrapper.append(item, labelElem);
+            return wrapper;
+        });
+
+        wrapper.append(...boxes);
+        return [wrapper];
     };
 
     class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store?.default {
