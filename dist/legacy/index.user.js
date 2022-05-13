@@ -62,6 +62,42 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var __read = (this && this.__read) || function (o, n) {
     var m = typeof Symbol === "function" && o[Symbol.iterator];
     if (!m) return o;
@@ -227,7 +263,7 @@ window.addEventListener("load", function () {
     };
     var makeStacksSelect = function (id, options) {
         var _a;
-        var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.description, description = _c === void 0 ? "" : _c, _d = options.disabled, disabled = _d === void 0 ? false : _d, _e = options.items, items = _e === void 0 ? [] : _e, _f = options.title, title = _f === void 0 ? "" : _f;
+        var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.description, description = _c === void 0 ? "" : _c, _d = options.disabled, disabled = _d === void 0 ? false : _d, _e = options.items, items = _e === void 0 ? [] : _e, _f = options.title, title = _f === void 0 ? "" : _f, _g = options.value, value = _g === void 0 ? "" : _g;
         var wrapper = document.createElement("div");
         (_a = wrapper.classList).add.apply(_a, __spreadArray(["d-flex", "gs4", "gsy", "fd-column"], __read(classes), false));
         if (title) {
@@ -258,9 +294,13 @@ window.addEventListener("load", function () {
             return option;
         });
         select.append.apply(select, __spreadArray([], __read(opts), false));
+        select.value = value;
         selectWrapper.append(select);
         wrapper.append(selectWrapper);
         return [wrapper, select];
+    };
+    var isInputLike = function (elem) {
+        return [HTMLInputElement, HTMLSelectElement].some(function (t) { return elem instanceof t; });
     };
     var Userscript = (function (_super) {
         __extends(Userscript, _super);
@@ -277,36 +317,76 @@ window.addEventListener("load", function () {
             return this;
         };
         Userscript.prototype.render = function () {
-            var _a = this, name = _a.name, options = _a.options;
-            var container = this.container || (this.container = document.createElement("div"));
-            container.classList.add("".concat(scriptName, "-userscript"), "d-flex", "fd-column", "mb24");
-            var header = document.createElement("h2");
-            header.classList.add("mb8");
-            header.textContent = name;
-            var handlerMap = {
-                "text": makeStacksTextInput,
-                "select": makeStacksSelect,
-                "checkbox": makeStacksCheckbox
-            };
-            var inputs = __spreadArray([], __read(options), false).map(function (_a) {
-                var _b = __read(_a, 2), key = _b[0], option = _b[1];
-                var desc = option.desc, def = option.def, _c = option.items, items = _c === void 0 ? [] : _c, _d = option.type, type = _d === void 0 ? "text" : _d;
-                var _e = __read(handlerMap[type]("".concat(scriptName, "-").concat(name, "-").concat(key), {
-                    items: items.map(function (item, idx) { return (__assign(__assign({}, item), { name: item.name || "".concat(scriptName, "-").concat(name, "-").concat(key, "-item-").concat(idx) })); }),
-                    description: desc,
-                    title: key,
-                    value: def
-                }), 1), inputWrapper = _e[0];
-                return inputWrapper;
+            return __awaiter(this, void 0, void 0, function () {
+                var _a, name, options, container, header, handlerMap, inputPromises, inputs, empty;
+                var _this = this;
+                return __generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _a = this, name = _a.name, options = _a.options;
+                            container = this.container || (this.container = document.createElement("div"));
+                            container.classList.add("".concat(scriptName, "-userscript"), "d-flex", "fd-column", "mb24");
+                            header = document.createElement("h2");
+                            header.classList.add("mb8");
+                            header.textContent = name;
+                            handlerMap = {
+                                "text": makeStacksTextInput,
+                                "select": makeStacksSelect,
+                                "checkbox": makeStacksCheckbox
+                            };
+                            inputPromises = __spreadArray([], __read(options), false).map(function (_a) {
+                                var _b = __read(_a, 2), key = _b[0], option = _b[1];
+                                return __awaiter(_this, void 0, void 0, function () {
+                                    var desc, def, _c, items, _d, type, value, _e, inputWrapper;
+                                    var _this = this;
+                                    return __generator(this, function (_f) {
+                                        switch (_f.label) {
+                                            case 0:
+                                                desc = option.desc, def = option.def, _c = option.items, items = _c === void 0 ? [] : _c, _d = option.type, type = _d === void 0 ? "text" : _d;
+                                                return [4, this.load(key, def)];
+                                            case 1:
+                                                value = _f.sent();
+                                                _e = __read(handlerMap[type]("".concat(scriptName, "-").concat(name, "-").concat(key), {
+                                                    items: items.map(function (item, idx) { return (__assign(__assign({}, item), { name: item.name || "".concat(scriptName, "-").concat(name, "-").concat(key, "-item-").concat(idx) })); }),
+                                                    description: desc,
+                                                    title: key,
+                                                    value: value
+                                                }), 1), inputWrapper = _e[0];
+                                                inputWrapper.addEventListener("change", function (_a) {
+                                                    var target = _a.target;
+                                                    return __awaiter(_this, void 0, void 0, function () {
+                                                        return __generator(this, function (_b) {
+                                                            switch (_b.label) {
+                                                                case 0:
+                                                                    if (!isInputLike(target))
+                                                                        return [2];
+                                                                    return [4, this.save(key, target.value)];
+                                                                case 1:
+                                                                    _b.sent();
+                                                                    return [2];
+                                                            }
+                                                        });
+                                                    });
+                                                });
+                                                return [2, inputWrapper];
+                                        }
+                                    });
+                                });
+                            });
+                            return [4, Promise.all(inputPromises)];
+                        case 1:
+                            inputs = _b.sent();
+                            clear(container);
+                            container.append.apply(container, __spreadArray([header], __read(inputs), false));
+                            if (!inputs.length) {
+                                empty = document.createElement("div");
+                                empty.textContent = "No configuration options available";
+                                container.append(empty);
+                            }
+                            return [2, container];
+                    }
+                });
             });
-            clear(container);
-            container.append.apply(container, __spreadArray([header], __read(inputs), false));
-            if (!inputs.length) {
-                var empty = document.createElement("div");
-                empty.textContent = "No configuration options available";
-                container.append(empty);
-            }
-            return container;
         };
         return Userscript;
     }((Store === null || Store === void 0 ? void 0 : Store.default)));
@@ -316,27 +396,38 @@ window.addEventListener("load", function () {
             this.scripts = new Map();
         }
         Configurer.prototype.render = function () {
-            var common = { parent: document.body };
-            var commonClasses = ["ps-fixed", "r0"];
-            var content = __spreadArray([], __read(this.scripts), false).map(function (_a) {
-                var _b = __read(_a, 2), _ = _b[0], s = _b[1];
-                return s.render();
+            return __awaiter(this, void 0, void 0, function () {
+                var common, commonClasses, contentPromises, contentElem, content;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            common = { parent: document.body };
+                            commonClasses = ["ps-fixed", "r0"];
+                            contentPromises = __spreadArray([], __read(this.scripts), false).map(function (_a) {
+                                var _b = __read(_a, 2), _ = _b[0], s = _b[1];
+                                return s.render();
+                            });
+                            this.controller || (this.controller = makeStacksButton("".concat(scriptName, "-modal-controller"), "UserScripters", __assign(__assign({}, common), { type: "outlined", muted: true, classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
+                                    "bar0", "t128"
+                                ], false) })));
+                            this.modal || (this.modal = makeStacksExpandable("".concat(scriptName, "-modal"), this.controller, __assign(__assign({}, common), { classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
+                                    "z-modal",
+                                    "".concat(scriptName, "-modal"),
+                                ], false), contentClasses: ["ba", "bar-lg", "bc-black-075", "bg-white", "p16", "wmn3"], expanded: false })));
+                            contentElem = this.modal.querySelector(".s-expandable--content");
+                            if (!contentElem) {
+                                console.debug("[".concat(scriptName, "] missing modal content element"));
+                                return [2, this];
+                            }
+                            return [4, Promise.all(contentPromises)];
+                        case 1:
+                            content = _a.sent();
+                            clear(contentElem);
+                            contentElem.append.apply(contentElem, __spreadArray([], __read(content), false));
+                            return [2, this];
+                    }
+                });
             });
-            this.controller || (this.controller = makeStacksButton("".concat(scriptName, "-modal-controller"), "UserScripters", __assign(__assign({}, common), { type: "outlined", muted: true, classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
-                    "bar0", "t128"
-                ], false) })));
-            this.modal || (this.modal = makeStacksExpandable("".concat(scriptName, "-modal"), this.controller, __assign(__assign({}, common), { classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
-                    "z-modal",
-                    "".concat(scriptName, "-modal"),
-                ], false), contentClasses: ["ba", "bar-lg", "bc-black-075", "bg-white", "p16", "wmn3"], expanded: false })));
-            var contentElem = this.modal.querySelector(".s-expandable--content");
-            if (!contentElem) {
-                console.debug("[".concat(scriptName, "] missing modal content element"));
-                return this;
-            }
-            clear(contentElem);
-            contentElem.append.apply(contentElem, __spreadArray([], __read(content), false));
-            return this;
         };
         Configurer.prototype.hide = function () {
             var _a, _b;

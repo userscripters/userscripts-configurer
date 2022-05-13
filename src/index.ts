@@ -50,6 +50,7 @@ interface StacksSelectOptions extends StacksCommonOptions {
     description?: string;
     items?: StacksSelectItem[];
     title?: string;
+    value?: string;
 }
 
 window.addEventListener("load", () => {
@@ -305,7 +306,8 @@ window.addEventListener("load", () => {
             description = "",
             disabled = false,
             items = [],
-            title = ""
+            title = "",
+            value = ""
         } = options;
 
         const wrapper = document.createElement("div");
@@ -352,9 +354,16 @@ window.addEventListener("load", () => {
         });
 
         select.append(...opts);
+
+        select.value = value;
+
         selectWrapper.append(select);
         wrapper.append(selectWrapper);
         return [wrapper, select];
+    };
+
+    const isInputLike = (elem: EventTarget | null): elem is HTMLInputElement | HTMLSelectElement => {
+        return [HTMLInputElement, HTMLSelectElement].some((t) => elem instanceof t);
     };
 
     class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store?.default {
@@ -380,7 +389,7 @@ window.addEventListener("load", () => {
         /**
          * @summary renders the userscript item
          */
-        render() {
+        async render() {
             const { name, options } = this;
 
             const container = this.container ||= document.createElement("div");
@@ -399,8 +408,10 @@ window.addEventListener("load", () => {
                 "checkbox": makeStacksCheckbox
             };
 
-            const inputs = [...options].map(([key, option]) => {
+            const inputPromises = [...options].map(async ([key, option]) => {
                 const { desc, def, items = [], type = "text" } = option;
+
+                const value = await this.load(key, def) as string;
 
                 const [inputWrapper] = handlerMap[type](
                     `${scriptName}-${name}-${key}`,
@@ -411,12 +422,19 @@ window.addEventListener("load", () => {
                         })),
                         description: desc,
                         title: key,
-                        value: def as string // TODO different input types
+                        value
                     }
                 );
 
+                inputWrapper.addEventListener("change", async ({ target }) => {
+                    if (!isInputLike(target)) return;
+                    await this.save(key, target.value);
+                });
+
                 return inputWrapper;
             });
+
+            const inputs = await Promise.all(inputPromises);
 
             clear(container);
             container.append(header, ...inputs);
@@ -456,11 +474,11 @@ window.addEventListener("load", () => {
         /**
          * @summary renders the configurer
          */
-        render() {
+        async render() {
             const common: StacksCommonOptions = { parent: document.body };
             const commonClasses = ["ps-fixed", "r0"];
 
-            const content = [...this.scripts].map(([_, s]) => s.render());
+            const contentPromises = [...this.scripts].map(([_, s]) => s.render());
 
             this.controller ||= makeStacksButton(
                 `${scriptName}-modal-controller`,
@@ -496,6 +514,8 @@ window.addEventListener("load", () => {
                 console.debug(`[${scriptName}] missing modal content element`);
                 return this;
             }
+
+            const content = await Promise.all(contentPromises);
 
             clear(contentElem);
             contentElem.append(...content);

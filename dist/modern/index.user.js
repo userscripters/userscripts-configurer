@@ -174,7 +174,7 @@ window.addEventListener("load", () => {
         return [wrapper];
     };
     const makeStacksSelect = (id, options) => {
-        const { classes = [], description = "", disabled = false, items = [], title = "" } = options;
+        const { classes = [], description = "", disabled = false, items = [], title = "", value = "" } = options;
         const wrapper = document.createElement("div");
         wrapper.classList.add("d-flex", "gs4", "gsy", "fd-column", ...classes);
         if (title) {
@@ -205,9 +205,13 @@ window.addEventListener("load", () => {
             return option;
         });
         select.append(...opts);
+        select.value = value;
         selectWrapper.append(select);
         wrapper.append(selectWrapper);
         return [wrapper, select];
+    };
+    const isInputLike = (elem) => {
+        return [HTMLInputElement, HTMLSelectElement].some((t) => elem instanceof t);
     };
     class Userscript extends (Store === null || Store === void 0 ? void 0 : Store.default) {
         constructor(name, storage) {
@@ -221,7 +225,7 @@ window.addEventListener("load", () => {
             this.render();
             return this;
         }
-        render() {
+        async render() {
             const { name, options } = this;
             const container = this.container || (this.container = document.createElement("div"));
             container.classList.add(`${scriptName}-userscript`, "d-flex", "fd-column", "mb24");
@@ -233,8 +237,9 @@ window.addEventListener("load", () => {
                 "select": makeStacksSelect,
                 "checkbox": makeStacksCheckbox
             };
-            const inputs = [...options].map(([key, option]) => {
+            const inputPromises = [...options].map(async ([key, option]) => {
                 const { desc, def, items = [], type = "text" } = option;
+                const value = await this.load(key, def);
                 const [inputWrapper] = handlerMap[type](`${scriptName}-${name}-${key}`, {
                     items: items.map((item, idx) => ({
                         ...item,
@@ -242,10 +247,16 @@ window.addEventListener("load", () => {
                     })),
                     description: desc,
                     title: key,
-                    value: def
+                    value
+                });
+                inputWrapper.addEventListener("change", async ({ target }) => {
+                    if (!isInputLike(target))
+                        return;
+                    await this.save(key, target.value);
                 });
                 return inputWrapper;
             });
+            const inputs = await Promise.all(inputPromises);
             clear(container);
             container.append(header, ...inputs);
             if (!inputs.length) {
@@ -261,10 +272,10 @@ window.addEventListener("load", () => {
             this.storage = storage;
             this.scripts = new Map();
         }
-        render() {
+        async render() {
             const common = { parent: document.body };
             const commonClasses = ["ps-fixed", "r0"];
-            const content = [...this.scripts].map(([_, s]) => s.render());
+            const contentPromises = [...this.scripts].map(([_, s]) => s.render());
             this.controller || (this.controller = makeStacksButton(`${scriptName}-modal-controller`, "UserScripters", {
                 ...common,
                 type: "outlined",
@@ -289,6 +300,7 @@ window.addEventListener("load", () => {
                 console.debug(`[${scriptName}] missing modal content element`);
                 return this;
             }
+            const content = await Promise.all(contentPromises);
             clear(contentElem);
             contentElem.append(...content);
             return this;
