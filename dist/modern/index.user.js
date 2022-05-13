@@ -39,7 +39,7 @@
 ;
 ;
 ;
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
     const scriptName = "userscript-configurer";
     const { Store } = window;
     if (!Store) {
@@ -454,5 +454,6 @@ window.addEventListener("load", () => {
     const configurer = new Configurer(storage);
     userscripts.Configurer || (userscripts.Configurer = configurer);
     appendStyles();
-    configurer.render();
+    await configurer.render();
+    unsafeWindow.dispatchEvent(new CustomEvent(`${scriptName}-load`));
 }, { once: true });

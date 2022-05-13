@@ -73,7 +73,7 @@ interface StacksSelectOptions extends StacksCommonOptions {
     value?: string;
 }
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
     const scriptName = "userscript-configurer";
 
     const { Store } = window;
@@ -794,6 +794,9 @@ window.addEventListener("load", () => {
 
     appendStyles();
 
-    configurer.render();
+    await configurer.render();
+
+    // done loading, notify subscribers it is safe to use the configurer now
+    unsafeWindow.dispatchEvent(new CustomEvent(`${scriptName}-load`));
 
 }, { once: true });

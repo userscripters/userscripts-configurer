@@ -137,462 +137,472 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 ;
 ;
 ;
-window.addEventListener("load", function () {
-    var scriptName = "userscript-configurer";
-    var Store = window.Store;
-    if (!Store) {
-        console.debug("[".concat(scriptName, "] missing UserScripters storage"));
-        return;
-    }
-    var clear = function (elem) { return __spreadArray([], __read(elem.children), false).forEach(function (c) { return c.remove(); }); };
-    var appendStyles = function () {
-        var style = document.createElement("style");
-        document.head.append(style);
-        var sheet = style.sheet;
-        if (!sheet)
-            return;
-        var rules = [
-            ".".concat(scriptName, "-modal {\n                top: 20vh;\n            }"),
-            ".".concat(scriptName, "-modal > .s-expandable--content:empty::after {\n                content: 'No userscripts to configure';\n            }"),
-            ".".concat(scriptName, "-userscript:last-child {\n                margin-bottom: var(--su2) !important;\n            }"),
-            ".".concat(scriptName, "-userscript-toast {\n                top: 20vh;\n                left: unset;\n            }")
-        ];
-        rules.forEach(function (rule) { return sheet.insertRule(rule); });
-    };
-    var makeStacksButton = function (id, text, _a) {
-        var _b;
-        var _c = _a === void 0 ? {} : _a, _d = _c.classes, classes = _d === void 0 ? [] : _d, title = _c.title, _e = _c.danger, danger = _e === void 0 ? false : _e, _f = _c.loading, loading = _f === void 0 ? false : _f, _g = _c.muted, muted = _g === void 0 ? false : _g, parent = _c.parent, _h = _c.primary, primary = _h === void 0 ? false : _h, _j = _c.type, type = _j === void 0 ? "filled" : _j;
-        var btn = document.createElement("button");
-        btn.id = id;
-        btn.textContent = text;
-        (_b = btn.classList).add.apply(_b, __spreadArray(["s-btn", "s-btn__".concat(type)], __read(classes), false));
-        btn.setAttribute("role", "button");
-        btn.setAttribute("aria-label", title || text);
-        var classList = btn.classList;
-        if (danger)
-            classList.add("s-btn__danger");
-        if (muted)
-            classList.add("s-btn__muted");
-        if (primary)
-            classList.add("s-btn__primary");
-        if (loading)
-            classList.add("is-loading");
-        if (title)
-            btn.title = title;
-        parent === null || parent === void 0 ? void 0 : parent.append(btn);
-        return btn;
-    };
-    var makeStacksExpandable = function (id, controller, options) {
-        var _a, _b;
-        if (options === void 0) { options = {}; }
-        var _c = options.classes, classes = _c === void 0 ? [] : _c, _d = options.content, content = _d === void 0 ? [] : _d, _e = options.contentClasses, contentClasses = _e === void 0 ? [] : _e, controllerClasses = options.controllerClasses, _f = options.expanded, expanded = _f === void 0 ? false : _f, parent = options.parent;
-        var containerElem = document.createElement("div");
-        (_a = containerElem.classList).add.apply(_a, __spreadArray(["s-expandable"], __read(classes), false));
-        containerElem.id = id;
-        if (expanded)
-            containerElem.classList.add("is-expanded");
-        var contentElem = document.createElement("div");
-        (_b = contentElem.classList).add.apply(_b, __spreadArray(["s-expandable--content"], __read(contentClasses), false));
-        contentElem.append.apply(contentElem, __spreadArray([], __read(content), false));
-        var dataset = controller.dataset;
-        dataset.controller = "s-expandable-control";
-        if (controllerClasses) {
-            dataset.sExpandableControlToggleClass = controllerClasses.join(" ");
-        }
-        controller.setAttribute("aria-controls", id);
-        controller.setAttribute("aria-expanded", JSON.stringify(expanded));
-        containerElem.append(contentElem);
-        parent === null || parent === void 0 ? void 0 : parent.append(containerElem);
-        return containerElem;
-    };
-    var makeStacksTextInput = function (id, options) {
-        var _a;
-        if (options === void 0) { options = {}; }
-        var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.description, description = _c === void 0 ? "" : _c, parent = options.parent, _d = options.placeholder, placeholder = _d === void 0 ? "" : _d, _e = options.title, title = _e === void 0 ? "" : _e, _f = options.value, value = _f === void 0 ? "" : _f;
-        var wrap = document.createElement("div");
-        (_a = wrap.classList).add.apply(_a, __spreadArray(["d-flex", "gs4", "gsy", "fd-column"], __read(classes), false));
-        var inputWrap = document.createElement("div");
-        inputWrap.classList.add("d-flex", "ps-relative");
-        var input = document.createElement("input");
-        input.classList.add("s-input");
-        input.id = id;
-        input.type = "text";
-        input.placeholder = placeholder;
-        input.value = value;
-        inputWrap.append(input);
-        wrap.append(inputWrap);
-        if (title) {
-            var lblWrap = document.createElement("div");
-            lblWrap.classList.add("flex--item");
-            var label = document.createElement("label");
-            label.classList.add("d-block", "s-label");
-            label.htmlFor = id;
-            label.textContent = title;
-            if (description) {
-                var desc = document.createElement("p");
-                desc.classList.add("s-description", "mt2");
-                desc.textContent = description;
-                label.append(desc);
-            }
-            lblWrap.append(label);
-            wrap.prepend(lblWrap);
-            return [wrap, input, label];
-        }
-        parent === null || parent === void 0 ? void 0 : parent.append(wrap);
-        return [wrap, input];
-    };
-    var makeStacksCheckbox = function (id, options) {
-        var _a;
-        var _b = options.items, items = _b === void 0 ? [] : _b, _c = options.classes, classes = _c === void 0 ? [] : _c;
-        var wrapper = document.createElement("fieldset");
-        (_a = wrapper.classList).add.apply(_a, __spreadArray(["mt8"], __read(classes), false));
-        wrapper.id = id;
-        var boxes = items.map(function (box) {
-            var _a = box.disabled, disabled = _a === void 0 ? false : _a, id = box.id, label = box.label, name = box.name, _b = box.selected, selected = _b === void 0 ? false : _b, _c = box.value, value = _c === void 0 ? "" : _c;
-            var wrapper = document.createElement("div");
-            var classList = wrapper.classList;
-            classList.add("d-flex", "gs8");
-            if (disabled)
-                classList.add("is-disabled");
-            var item = document.createElement("div");
-            item.classList.add("flex--item");
-            var input = document.createElement("input");
-            input.classList.add("s-checkbox");
-            input.disabled = disabled;
-            input.id = id || name;
-            input.name = name;
-            input.type = "checkbox";
-            input.checked = selected;
-            input.value = value;
-            var labelElem = document.createElement("label");
-            labelElem.classList.add("flex--item", "s-label", "fw-normal");
-            labelElem.htmlFor = id || name;
-            labelElem.textContent = label;
-            item.append(input);
-            wrapper.append(item, labelElem);
-            return wrapper;
-        });
-        wrapper.append.apply(wrapper, __spreadArray([], __read(boxes), false));
-        return [wrapper];
-    };
-    var makeStacksSelect = function (id, options) {
-        var _a;
-        var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.description, description = _c === void 0 ? "" : _c, _d = options.disabled, disabled = _d === void 0 ? false : _d, _e = options.items, items = _e === void 0 ? [] : _e, _f = options.title, title = _f === void 0 ? "" : _f, _g = options.value, value = _g === void 0 ? "" : _g;
-        var wrapper = document.createElement("div");
-        (_a = wrapper.classList).add.apply(_a, __spreadArray(["d-flex", "gs4", "gsy", "fd-column"], __read(classes), false));
-        if (title) {
-            var label = document.createElement("label");
-            label.classList.add("d-block", "s-label");
-            label.htmlFor = id;
-            label.textContent = title;
-            if (description) {
-                var desc = document.createElement("p");
-                desc.classList.add("s-description", "mt2");
-                desc.textContent = description;
-                label.append(desc);
-            }
-            wrapper.append(label);
-        }
-        var selectWrapper = document.createElement("div");
-        selectWrapper.classList.add("flex--item", "s-select");
-        var select = document.createElement("select");
-        select.id = id;
-        select.disabled = disabled;
-        var opts = items.map(function (item) {
-            var _a = item.disabled, disabled = _a === void 0 ? false : _a, label = item.label, _b = item.selected, selected = _b === void 0 ? false : _b, _c = item.value, value = _c === void 0 ? "" : _c;
-            var option = document.createElement("option");
-            option.selected = selected;
-            option.value = value;
-            option.textContent = label;
-            option.disabled = disabled;
-            return option;
-        });
-        select.append.apply(select, __spreadArray([], __read(opts), false));
-        select.value = value;
-        selectWrapper.append(select);
-        wrapper.append(selectWrapper);
-        return [wrapper, select];
-    };
-    var makeStacksIcon = function (name, pathConfig, _a) {
-        var _b;
-        var _c = _a === void 0 ? {} : _a, _d = _c.classes, classes = _d === void 0 ? [] : _d, _e = _c.width, width = _e === void 0 ? 14 : _e, _f = _c.height, height = _f === void 0 ? width : _f;
-        var ns = "http://www.w3.org/2000/svg";
-        var svg = document.createElementNS(ns, "svg");
-        (_b = svg.classList).add.apply(_b, __spreadArray(["svg-icon", name], __read(classes), false));
-        svg.setAttribute("width", width.toString());
-        svg.setAttribute("height", height.toString());
-        svg.setAttribute("viewBox", "0 0 ".concat(width, " ").concat(height));
-        svg.setAttribute("aria-hidden", "true");
-        var path = document.createElementNS(ns, "path");
-        path.setAttribute("d", pathConfig);
-        svg.append(path);
-        return [svg, path];
-    };
-    var makeStacksToast = function (id, text, options) {
-        var _a, _b;
-        if (options === void 0) { options = {}; }
-        var _c = options.buttons, buttons = _c === void 0 ? [] : _c, _d = options.classes, classes = _d === void 0 ? [] : _d, _e = options.important, important = _e === void 0 ? false : _e, _f = options.msgClasses, msgClasses = _f === void 0 ? [] : _f, parent = options.parent, _g = options.type, type = _g === void 0 ? "none" : _g;
-        var wrap = document.createElement("div");
-        (_a = wrap.classList).add.apply(_a, __spreadArray(["s-toast"], __read(classes), false));
-        wrap.setAttribute("aria-hidden", "true");
-        wrap.setAttribute("role", "alertdialog");
-        wrap.setAttribute("aria-labelledby", "notice-message");
-        wrap.id = id;
-        var aside = document.createElement("aside");
-        aside.classList.add("s-notice", "p8", "pl16");
-        if (type !== "none")
-            aside.classList.add("s-notice__".concat(type));
-        if (important)
-            aside.classList.add("s-notice__important");
-        var msgWrap = document.createElement("div");
-        (_b = msgWrap.classList).add.apply(_b, __spreadArray(["d-flex",
-            "gs16",
-            "gsx",
-            "ai-center",
-            "jc-space-between"], __read(msgClasses), false));
-        var message = document.createElement("div");
-        message.classList.add("flex--item");
-        message.textContent = text;
-        var btnWrap = document.createElement("div");
-        btnWrap.classList.add("d-flex");
-        var dismissBtn = document.createElement("button");
-        dismissBtn.type = "button";
-        dismissBtn.classList.add("s-btn", "s-notice--btn");
-        dismissBtn.setAttribute("aria-label", "Dismiss");
-        buttons.push(dismissBtn);
-        var _h = __read(makeStacksIcon("iconClearSm", "M12 3.41 10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7 12 3.41z"), 1), dismissIcon = _h[0];
-        dismissBtn.append(dismissIcon);
-        btnWrap.append.apply(btnWrap, __spreadArray([], __read(buttons), false));
-        msgWrap.append(message, btnWrap);
-        aside.append(msgWrap);
-        wrap.append(aside);
-        if (parent)
-            parent.append(wrap);
-        return wrap;
-    };
-    var toggleToast = function (target, show) {
-        var toast = typeof target === "string" ? document.querySelector(target) : target;
-        if (!toast)
-            throw new ReferenceError("missing toast: ".concat(target));
-        var isShown = (toast === null || toast === void 0 ? void 0 : toast.getAttribute("aria-hidden")) !== "true";
-        toast.setAttribute("aria-hidden", (show !== void 0 ? !show : isShown).toString());
-        return toast;
-    };
-    var hideToast = function (target, hideFor) {
-        var toast = toggleToast(target, false);
-        if (hideFor)
-            setTimeout(function () { return showToast(toast); }, hideFor * 1e3);
-    };
-    var showToast = function (target, showFor) {
-        var toast = toggleToast(target, true);
-        if (showFor)
-            setTimeout(function () { return hideToast(toast); }, showFor * 1e3);
-    };
-    var isInputLike = function (elem) {
-        return [HTMLInputElement, HTMLSelectElement].some(function (t) { return elem instanceof t; });
-    };
-    var isCheckedBox = function (elem) {
-        return elem instanceof HTMLInputElement && elem.checked;
-    };
-    var Userscript = (function (_super) {
-        __extends(Userscript, _super);
-        function Userscript(name, storage) {
-            var _this = _super.call(this, name, storage) || this;
-            _this.name = name;
-            _this.storage = storage;
-            _this.options = new Map();
-            return _this;
-        }
-        Userscript.prototype.option = function (name, config) {
-            this.options.set(name, __assign({ name: name }, config));
-            this.render();
-            return this;
-        };
-        Userscript.prototype.render = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var _a, userscriptName, options, container, header, handlerMap, inputPromises, inputs, empty;
-                var _this = this;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0:
-                            _a = this, userscriptName = _a.name, options = _a.options;
-                            container = this.container || (this.container = document.createElement("div"));
-                            container.classList.add("".concat(scriptName, "-userscript"), "d-flex", "fd-column", "mb24");
-                            header = document.createElement("h2");
-                            header.classList.add("mb8");
-                            header.textContent = userscriptName;
-                            handlerMap = {
-                                "text": makeStacksTextInput,
-                                "select": makeStacksSelect,
-                                "checkbox": makeStacksCheckbox
-                            };
-                            inputPromises = __spreadArray([], __read(options), false).map(function (_a) {
-                                var _b = __read(_a, 2), key = _b[0], option = _b[1];
-                                return __awaiter(_this, void 0, void 0, function () {
-                                    var desc, def, _c, items, _d, type, values, isArr, inputName, options, _e, inputWrapper;
-                                    var _this = this;
-                                    return __generator(this, function (_f) {
-                                        switch (_f.label) {
-                                            case 0:
-                                                desc = option.desc, def = option.def, _c = option.items, items = _c === void 0 ? [] : _c, _d = option.type, type = _d === void 0 ? "text" : _d;
-                                                return [4, this.load(key, def)];
-                                            case 1:
-                                                values = _f.sent();
-                                                isArr = Array.isArray(values);
-                                                inputName = "".concat(scriptName, "-").concat(userscriptName, "-").concat(key);
-                                                options = {
-                                                    items: items.map(function (item, idx) {
-                                                        var value = item.value, name = item.name, selected = item.selected, rest = __rest(item, ["value", "name", "selected"]);
-                                                        return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
-                                                    }),
-                                                    description: desc,
-                                                    title: key,
-                                                };
-                                                if (!isArr)
-                                                    options.value = values;
-                                                _e = __read(handlerMap[type](inputName, options), 1), inputWrapper = _e[0];
-                                                inputWrapper.addEventListener("change", function (_a) {
-                                                    var currentTarget = _a.currentTarget, target = _a.target;
-                                                    return __awaiter(_this, void 0, void 0, function () {
-                                                        var value;
-                                                        return __generator(this, function (_b) {
-                                                            switch (_b.label) {
-                                                                case 0:
-                                                                    if (!isInputLike(target))
-                                                                        return [2];
-                                                                    value = (currentTarget instanceof HTMLFieldSetElement ?
-                                                                        { value: __spreadArray([], __read(currentTarget.elements), false).filter(isCheckedBox).map(function (e) { return e.value; }) } :
-                                                                        target).value;
-                                                                    return [4, this.save(key, value)];
-                                                                case 1:
-                                                                    _b.sent();
-                                                                    container.dispatchEvent(new CustomEvent("".concat(scriptName, "-success"), {
-                                                                        bubbles: true,
-                                                                        detail: {
-                                                                            key: key,
-                                                                            script: scriptName,
-                                                                            value: value
+window.addEventListener("load", function () { return __awaiter(void 0, void 0, void 0, function () {
+    var scriptName, Store, clear, appendStyles, makeStacksButton, makeStacksExpandable, makeStacksTextInput, makeStacksCheckbox, makeStacksSelect, makeStacksIcon, makeStacksToast, toggleToast, hideToast, showToast, isInputLike, isCheckedBox, Userscript, Configurer, userscripters, userscripts, storage, configurer;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                scriptName = "userscript-configurer";
+                Store = window.Store;
+                if (!Store) {
+                    console.debug("[".concat(scriptName, "] missing UserScripters storage"));
+                    return [2];
+                }
+                clear = function (elem) { return __spreadArray([], __read(elem.children), false).forEach(function (c) { return c.remove(); }); };
+                appendStyles = function () {
+                    var style = document.createElement("style");
+                    document.head.append(style);
+                    var sheet = style.sheet;
+                    if (!sheet)
+                        return;
+                    var rules = [
+                        ".".concat(scriptName, "-modal {\n                top: 20vh;\n            }"),
+                        ".".concat(scriptName, "-modal > .s-expandable--content:empty::after {\n                content: 'No userscripts to configure';\n            }"),
+                        ".".concat(scriptName, "-userscript:last-child {\n                margin-bottom: var(--su2) !important;\n            }"),
+                        ".".concat(scriptName, "-userscript-toast {\n                top: 20vh;\n                left: unset;\n            }")
+                    ];
+                    rules.forEach(function (rule) { return sheet.insertRule(rule); });
+                };
+                makeStacksButton = function (id, text, _a) {
+                    var _b;
+                    var _c = _a === void 0 ? {} : _a, _d = _c.classes, classes = _d === void 0 ? [] : _d, title = _c.title, _e = _c.danger, danger = _e === void 0 ? false : _e, _f = _c.loading, loading = _f === void 0 ? false : _f, _g = _c.muted, muted = _g === void 0 ? false : _g, parent = _c.parent, _h = _c.primary, primary = _h === void 0 ? false : _h, _j = _c.type, type = _j === void 0 ? "filled" : _j;
+                    var btn = document.createElement("button");
+                    btn.id = id;
+                    btn.textContent = text;
+                    (_b = btn.classList).add.apply(_b, __spreadArray(["s-btn", "s-btn__".concat(type)], __read(classes), false));
+                    btn.setAttribute("role", "button");
+                    btn.setAttribute("aria-label", title || text);
+                    var classList = btn.classList;
+                    if (danger)
+                        classList.add("s-btn__danger");
+                    if (muted)
+                        classList.add("s-btn__muted");
+                    if (primary)
+                        classList.add("s-btn__primary");
+                    if (loading)
+                        classList.add("is-loading");
+                    if (title)
+                        btn.title = title;
+                    parent === null || parent === void 0 ? void 0 : parent.append(btn);
+                    return btn;
+                };
+                makeStacksExpandable = function (id, controller, options) {
+                    var _a, _b;
+                    if (options === void 0) { options = {}; }
+                    var _c = options.classes, classes = _c === void 0 ? [] : _c, _d = options.content, content = _d === void 0 ? [] : _d, _e = options.contentClasses, contentClasses = _e === void 0 ? [] : _e, controllerClasses = options.controllerClasses, _f = options.expanded, expanded = _f === void 0 ? false : _f, parent = options.parent;
+                    var containerElem = document.createElement("div");
+                    (_a = containerElem.classList).add.apply(_a, __spreadArray(["s-expandable"], __read(classes), false));
+                    containerElem.id = id;
+                    if (expanded)
+                        containerElem.classList.add("is-expanded");
+                    var contentElem = document.createElement("div");
+                    (_b = contentElem.classList).add.apply(_b, __spreadArray(["s-expandable--content"], __read(contentClasses), false));
+                    contentElem.append.apply(contentElem, __spreadArray([], __read(content), false));
+                    var dataset = controller.dataset;
+                    dataset.controller = "s-expandable-control";
+                    if (controllerClasses) {
+                        dataset.sExpandableControlToggleClass = controllerClasses.join(" ");
+                    }
+                    controller.setAttribute("aria-controls", id);
+                    controller.setAttribute("aria-expanded", JSON.stringify(expanded));
+                    containerElem.append(contentElem);
+                    parent === null || parent === void 0 ? void 0 : parent.append(containerElem);
+                    return containerElem;
+                };
+                makeStacksTextInput = function (id, options) {
+                    var _a;
+                    if (options === void 0) { options = {}; }
+                    var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.description, description = _c === void 0 ? "" : _c, parent = options.parent, _d = options.placeholder, placeholder = _d === void 0 ? "" : _d, _e = options.title, title = _e === void 0 ? "" : _e, _f = options.value, value = _f === void 0 ? "" : _f;
+                    var wrap = document.createElement("div");
+                    (_a = wrap.classList).add.apply(_a, __spreadArray(["d-flex", "gs4", "gsy", "fd-column"], __read(classes), false));
+                    var inputWrap = document.createElement("div");
+                    inputWrap.classList.add("d-flex", "ps-relative");
+                    var input = document.createElement("input");
+                    input.classList.add("s-input");
+                    input.id = id;
+                    input.type = "text";
+                    input.placeholder = placeholder;
+                    input.value = value;
+                    inputWrap.append(input);
+                    wrap.append(inputWrap);
+                    if (title) {
+                        var lblWrap = document.createElement("div");
+                        lblWrap.classList.add("flex--item");
+                        var label = document.createElement("label");
+                        label.classList.add("d-block", "s-label");
+                        label.htmlFor = id;
+                        label.textContent = title;
+                        if (description) {
+                            var desc = document.createElement("p");
+                            desc.classList.add("s-description", "mt2");
+                            desc.textContent = description;
+                            label.append(desc);
+                        }
+                        lblWrap.append(label);
+                        wrap.prepend(lblWrap);
+                        return [wrap, input, label];
+                    }
+                    parent === null || parent === void 0 ? void 0 : parent.append(wrap);
+                    return [wrap, input];
+                };
+                makeStacksCheckbox = function (id, options) {
+                    var _a;
+                    var _b = options.items, items = _b === void 0 ? [] : _b, _c = options.classes, classes = _c === void 0 ? [] : _c;
+                    var wrapper = document.createElement("fieldset");
+                    (_a = wrapper.classList).add.apply(_a, __spreadArray(["mt8"], __read(classes), false));
+                    wrapper.id = id;
+                    var boxes = items.map(function (box) {
+                        var _a = box.disabled, disabled = _a === void 0 ? false : _a, id = box.id, label = box.label, name = box.name, _b = box.selected, selected = _b === void 0 ? false : _b, _c = box.value, value = _c === void 0 ? "" : _c;
+                        var wrapper = document.createElement("div");
+                        var classList = wrapper.classList;
+                        classList.add("d-flex", "gs8");
+                        if (disabled)
+                            classList.add("is-disabled");
+                        var item = document.createElement("div");
+                        item.classList.add("flex--item");
+                        var input = document.createElement("input");
+                        input.classList.add("s-checkbox");
+                        input.disabled = disabled;
+                        input.id = id || name;
+                        input.name = name;
+                        input.type = "checkbox";
+                        input.checked = selected;
+                        input.value = value;
+                        var labelElem = document.createElement("label");
+                        labelElem.classList.add("flex--item", "s-label", "fw-normal");
+                        labelElem.htmlFor = id || name;
+                        labelElem.textContent = label;
+                        item.append(input);
+                        wrapper.append(item, labelElem);
+                        return wrapper;
+                    });
+                    wrapper.append.apply(wrapper, __spreadArray([], __read(boxes), false));
+                    return [wrapper];
+                };
+                makeStacksSelect = function (id, options) {
+                    var _a;
+                    var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.description, description = _c === void 0 ? "" : _c, _d = options.disabled, disabled = _d === void 0 ? false : _d, _e = options.items, items = _e === void 0 ? [] : _e, _f = options.title, title = _f === void 0 ? "" : _f, _g = options.value, value = _g === void 0 ? "" : _g;
+                    var wrapper = document.createElement("div");
+                    (_a = wrapper.classList).add.apply(_a, __spreadArray(["d-flex", "gs4", "gsy", "fd-column"], __read(classes), false));
+                    if (title) {
+                        var label = document.createElement("label");
+                        label.classList.add("d-block", "s-label");
+                        label.htmlFor = id;
+                        label.textContent = title;
+                        if (description) {
+                            var desc = document.createElement("p");
+                            desc.classList.add("s-description", "mt2");
+                            desc.textContent = description;
+                            label.append(desc);
+                        }
+                        wrapper.append(label);
+                    }
+                    var selectWrapper = document.createElement("div");
+                    selectWrapper.classList.add("flex--item", "s-select");
+                    var select = document.createElement("select");
+                    select.id = id;
+                    select.disabled = disabled;
+                    var opts = items.map(function (item) {
+                        var _a = item.disabled, disabled = _a === void 0 ? false : _a, label = item.label, _b = item.selected, selected = _b === void 0 ? false : _b, _c = item.value, value = _c === void 0 ? "" : _c;
+                        var option = document.createElement("option");
+                        option.selected = selected;
+                        option.value = value;
+                        option.textContent = label;
+                        option.disabled = disabled;
+                        return option;
+                    });
+                    select.append.apply(select, __spreadArray([], __read(opts), false));
+                    select.value = value;
+                    selectWrapper.append(select);
+                    wrapper.append(selectWrapper);
+                    return [wrapper, select];
+                };
+                makeStacksIcon = function (name, pathConfig, _a) {
+                    var _b;
+                    var _c = _a === void 0 ? {} : _a, _d = _c.classes, classes = _d === void 0 ? [] : _d, _e = _c.width, width = _e === void 0 ? 14 : _e, _f = _c.height, height = _f === void 0 ? width : _f;
+                    var ns = "http://www.w3.org/2000/svg";
+                    var svg = document.createElementNS(ns, "svg");
+                    (_b = svg.classList).add.apply(_b, __spreadArray(["svg-icon", name], __read(classes), false));
+                    svg.setAttribute("width", width.toString());
+                    svg.setAttribute("height", height.toString());
+                    svg.setAttribute("viewBox", "0 0 ".concat(width, " ").concat(height));
+                    svg.setAttribute("aria-hidden", "true");
+                    var path = document.createElementNS(ns, "path");
+                    path.setAttribute("d", pathConfig);
+                    svg.append(path);
+                    return [svg, path];
+                };
+                makeStacksToast = function (id, text, options) {
+                    var _a, _b;
+                    if (options === void 0) { options = {}; }
+                    var _c = options.buttons, buttons = _c === void 0 ? [] : _c, _d = options.classes, classes = _d === void 0 ? [] : _d, _e = options.important, important = _e === void 0 ? false : _e, _f = options.msgClasses, msgClasses = _f === void 0 ? [] : _f, parent = options.parent, _g = options.type, type = _g === void 0 ? "none" : _g;
+                    var wrap = document.createElement("div");
+                    (_a = wrap.classList).add.apply(_a, __spreadArray(["s-toast"], __read(classes), false));
+                    wrap.setAttribute("aria-hidden", "true");
+                    wrap.setAttribute("role", "alertdialog");
+                    wrap.setAttribute("aria-labelledby", "notice-message");
+                    wrap.id = id;
+                    var aside = document.createElement("aside");
+                    aside.classList.add("s-notice", "p8", "pl16");
+                    if (type !== "none")
+                        aside.classList.add("s-notice__".concat(type));
+                    if (important)
+                        aside.classList.add("s-notice__important");
+                    var msgWrap = document.createElement("div");
+                    (_b = msgWrap.classList).add.apply(_b, __spreadArray(["d-flex",
+                        "gs16",
+                        "gsx",
+                        "ai-center",
+                        "jc-space-between"], __read(msgClasses), false));
+                    var message = document.createElement("div");
+                    message.classList.add("flex--item");
+                    message.textContent = text;
+                    var btnWrap = document.createElement("div");
+                    btnWrap.classList.add("d-flex");
+                    var dismissBtn = document.createElement("button");
+                    dismissBtn.type = "button";
+                    dismissBtn.classList.add("s-btn", "s-notice--btn");
+                    dismissBtn.setAttribute("aria-label", "Dismiss");
+                    buttons.push(dismissBtn);
+                    var _h = __read(makeStacksIcon("iconClearSm", "M12 3.41 10.59 2 7 5.59 3.41 2 2 3.41 5.59 7 2 10.59 3.41 12 7 8.41 10.59 12 12 10.59 8.41 7 12 3.41z"), 1), dismissIcon = _h[0];
+                    dismissBtn.append(dismissIcon);
+                    btnWrap.append.apply(btnWrap, __spreadArray([], __read(buttons), false));
+                    msgWrap.append(message, btnWrap);
+                    aside.append(msgWrap);
+                    wrap.append(aside);
+                    if (parent)
+                        parent.append(wrap);
+                    return wrap;
+                };
+                toggleToast = function (target, show) {
+                    var toast = typeof target === "string" ? document.querySelector(target) : target;
+                    if (!toast)
+                        throw new ReferenceError("missing toast: ".concat(target));
+                    var isShown = (toast === null || toast === void 0 ? void 0 : toast.getAttribute("aria-hidden")) !== "true";
+                    toast.setAttribute("aria-hidden", (show !== void 0 ? !show : isShown).toString());
+                    return toast;
+                };
+                hideToast = function (target, hideFor) {
+                    var toast = toggleToast(target, false);
+                    if (hideFor)
+                        setTimeout(function () { return showToast(toast); }, hideFor * 1e3);
+                };
+                showToast = function (target, showFor) {
+                    var toast = toggleToast(target, true);
+                    if (showFor)
+                        setTimeout(function () { return hideToast(toast); }, showFor * 1e3);
+                };
+                isInputLike = function (elem) {
+                    return [HTMLInputElement, HTMLSelectElement].some(function (t) { return elem instanceof t; });
+                };
+                isCheckedBox = function (elem) {
+                    return elem instanceof HTMLInputElement && elem.checked;
+                };
+                Userscript = (function (_super) {
+                    __extends(Userscript, _super);
+                    function Userscript(name, storage) {
+                        var _this = _super.call(this, name, storage) || this;
+                        _this.name = name;
+                        _this.storage = storage;
+                        _this.options = new Map();
+                        return _this;
+                    }
+                    Userscript.prototype.option = function (name, config) {
+                        this.options.set(name, __assign({ name: name }, config));
+                        this.render();
+                        return this;
+                    };
+                    Userscript.prototype.render = function () {
+                        return __awaiter(this, void 0, void 0, function () {
+                            var _a, userscriptName, options, container, header, handlerMap, inputPromises, inputs, empty;
+                            var _this = this;
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
+                                    case 0:
+                                        _a = this, userscriptName = _a.name, options = _a.options;
+                                        container = this.container || (this.container = document.createElement("div"));
+                                        container.classList.add("".concat(scriptName, "-userscript"), "d-flex", "fd-column", "mb24");
+                                        header = document.createElement("h2");
+                                        header.classList.add("mb8");
+                                        header.textContent = userscriptName;
+                                        handlerMap = {
+                                            "text": makeStacksTextInput,
+                                            "select": makeStacksSelect,
+                                            "checkbox": makeStacksCheckbox
+                                        };
+                                        inputPromises = __spreadArray([], __read(options), false).map(function (_a) {
+                                            var _b = __read(_a, 2), key = _b[0], option = _b[1];
+                                            return __awaiter(_this, void 0, void 0, function () {
+                                                var desc, def, _c, items, _d, type, values, isArr, inputName, options, _e, inputWrapper;
+                                                var _this = this;
+                                                return __generator(this, function (_f) {
+                                                    switch (_f.label) {
+                                                        case 0:
+                                                            desc = option.desc, def = option.def, _c = option.items, items = _c === void 0 ? [] : _c, _d = option.type, type = _d === void 0 ? "text" : _d;
+                                                            return [4, this.load(key, def)];
+                                                        case 1:
+                                                            values = _f.sent();
+                                                            isArr = Array.isArray(values);
+                                                            inputName = "".concat(scriptName, "-").concat(userscriptName, "-").concat(key);
+                                                            options = {
+                                                                items: items.map(function (item, idx) {
+                                                                    var value = item.value, name = item.name, selected = item.selected, rest = __rest(item, ["value", "name", "selected"]);
+                                                                    return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
+                                                                }),
+                                                                description: desc,
+                                                                title: key,
+                                                            };
+                                                            if (!isArr)
+                                                                options.value = values;
+                                                            _e = __read(handlerMap[type](inputName, options), 1), inputWrapper = _e[0];
+                                                            inputWrapper.addEventListener("change", function (_a) {
+                                                                var currentTarget = _a.currentTarget, target = _a.target;
+                                                                return __awaiter(_this, void 0, void 0, function () {
+                                                                    var value;
+                                                                    return __generator(this, function (_b) {
+                                                                        switch (_b.label) {
+                                                                            case 0:
+                                                                                if (!isInputLike(target))
+                                                                                    return [2];
+                                                                                value = (currentTarget instanceof HTMLFieldSetElement ?
+                                                                                    { value: __spreadArray([], __read(currentTarget.elements), false).filter(isCheckedBox).map(function (e) { return e.value; }) } :
+                                                                                    target).value;
+                                                                                return [4, this.save(key, value)];
+                                                                            case 1:
+                                                                                _b.sent();
+                                                                                container.dispatchEvent(new CustomEvent("".concat(scriptName, "-success"), {
+                                                                                    bubbles: true,
+                                                                                    detail: {
+                                                                                        key: key,
+                                                                                        script: scriptName,
+                                                                                        value: value
+                                                                                    }
+                                                                                }));
+                                                                                return [2];
                                                                         }
-                                                                    }));
-                                                                    return [2];
-                                                            }
-                                                        });
-                                                    });
+                                                                    });
+                                                                });
+                                                            });
+                                                            return [2, inputWrapper];
+                                                    }
                                                 });
-                                                return [2, inputWrapper];
+                                            });
+                                        });
+                                        this.toast || (this.toast = makeStacksToast("".concat(scriptName, "-toast"), "Updated ".concat(name, " config"), {
+                                            classes: [
+                                                "".concat(scriptName, "-userscript-toast"),
+                                                "wmn3", "r0", "jc-end"
+                                            ],
+                                            type: "success"
+                                        }));
+                                        container.addEventListener("".concat(scriptName, "-success"), function () {
+                                            var toast = _this.toast;
+                                            if (toast)
+                                                showToast(toast, 1);
+                                        });
+                                        return [4, Promise.all(inputPromises)];
+                                    case 1:
+                                        inputs = _b.sent();
+                                        clear(container);
+                                        container.append.apply(container, __spreadArray([this.toast, header], __read(inputs), false));
+                                        if (!inputs.length) {
+                                            empty = document.createElement("div");
+                                            empty.textContent = "No configuration options available";
+                                            container.append(empty);
                                         }
-                                    });
-                                });
+                                        return [2, container];
+                                }
                             });
-                            this.toast || (this.toast = makeStacksToast("".concat(scriptName, "-toast"), "Updated ".concat(name, " config"), {
-                                classes: [
-                                    "".concat(scriptName, "-userscript-toast"),
-                                    "wmn3", "r0", "jc-end"
-                                ],
-                                type: "success"
-                            }));
-                            container.addEventListener("".concat(scriptName, "-success"), function () {
-                                var toast = _this.toast;
-                                if (toast)
-                                    showToast(toast, 1);
-                            });
-                            return [4, Promise.all(inputPromises)];
-                        case 1:
-                            inputs = _b.sent();
-                            clear(container);
-                            container.append.apply(container, __spreadArray([this.toast, header], __read(inputs), false));
-                            if (!inputs.length) {
-                                empty = document.createElement("div");
-                                empty.textContent = "No configuration options available";
-                                container.append(empty);
-                            }
-                            return [2, container];
+                        });
+                    };
+                    return Userscript;
+                }((Store === null || Store === void 0 ? void 0 : Store.default)));
+                Configurer = (function () {
+                    function Configurer(storage) {
+                        this.storage = storage;
+                        this.scripts = new Map();
                     }
-                });
-            });
-        };
-        return Userscript;
-    }((Store === null || Store === void 0 ? void 0 : Store.default)));
-    var Configurer = (function () {
-        function Configurer(storage) {
-            this.storage = storage;
-            this.scripts = new Map();
+                    Configurer.prototype.render = function () {
+                        return __awaiter(this, void 0, void 0, function () {
+                            var common, commonClasses, contentPromises, contentElem, content;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        common = { parent: document.body };
+                                        commonClasses = ["ps-fixed", "r0"];
+                                        contentPromises = __spreadArray([], __read(this.scripts), false).map(function (_a) {
+                                            var _b = __read(_a, 2), _ = _b[0], s = _b[1];
+                                            return s.render();
+                                        });
+                                        this.controller || (this.controller = makeStacksButton("".concat(scriptName, "-modal-controller"), "UserScripters", __assign(__assign({}, common), { type: "outlined", muted: true, classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
+                                                "bar0", "t128"
+                                            ], false) })));
+                                        this.modal || (this.modal = makeStacksExpandable("".concat(scriptName, "-modal"), this.controller, __assign(__assign({}, common), { classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
+                                                "z-modal",
+                                                "".concat(scriptName, "-modal"),
+                                            ], false), contentClasses: ["ba", "bar-lg", "bc-black-075", "bg-white", "p16", "wmn3"], expanded: false })));
+                                        contentElem = this.modal.querySelector(".s-expandable--content");
+                                        if (!contentElem) {
+                                            console.debug("[".concat(scriptName, "] missing modal content element"));
+                                            return [2, this];
+                                        }
+                                        return [4, Promise.all(contentPromises)];
+                                    case 1:
+                                        content = _a.sent();
+                                        clear(contentElem);
+                                        contentElem.append.apply(contentElem, __spreadArray([], __read(content), false));
+                                        return [2, this];
+                                }
+                            });
+                        });
+                    };
+                    Configurer.prototype.hide = function () {
+                        var _a, _b;
+                        if ((_a = this.modal) === null || _a === void 0 ? void 0 : _a.classList.contains("is-expanded")) {
+                            (_b = this.controller) === null || _b === void 0 ? void 0 : _b.click();
+                        }
+                        return this;
+                    };
+                    Configurer.prototype.get = function (name) {
+                        var scripts = this.scripts;
+                        return scripts.get(name);
+                    };
+                    Configurer.prototype.register = function (name) {
+                        var storage = this.storage;
+                        var script = new Userscript(name, storage);
+                        this.scripts.set(name, script);
+                        this.render();
+                        return script;
+                    };
+                    Configurer.prototype.show = function () {
+                        var _a, _b;
+                        if (!((_a = this.modal) === null || _a === void 0 ? void 0 : _a.classList.contains("is-expanded"))) {
+                            (_b = this.controller) === null || _b === void 0 ? void 0 : _b.click();
+                        }
+                        return this;
+                    };
+                    Configurer.prototype.unregister = function (name) {
+                        var scripts = this.scripts;
+                        var script = scripts.get(name);
+                        if (script) {
+                            scripts.delete(name);
+                            this.render();
+                        }
+                        return script;
+                    };
+                    return Configurer;
+                }());
+                userscripters = unsafeWindow.UserScripters || (unsafeWindow.UserScripters = {});
+                userscripts = userscripters.Userscripts || (userscripters.Userscripts = {});
+                storage = Store.locateStorage();
+                configurer = new Configurer(storage);
+                userscripts.Configurer || (userscripts.Configurer = configurer);
+                appendStyles();
+                return [4, configurer.render()];
+            case 1:
+                _a.sent();
+                unsafeWindow.dispatchEvent(new CustomEvent("".concat(scriptName, "-load")));
+                return [2];
         }
-        Configurer.prototype.render = function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var common, commonClasses, contentPromises, contentElem, content;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0:
-                            common = { parent: document.body };
-                            commonClasses = ["ps-fixed", "r0"];
-                            contentPromises = __spreadArray([], __read(this.scripts), false).map(function (_a) {
-                                var _b = __read(_a, 2), _ = _b[0], s = _b[1];
-                                return s.render();
-                            });
-                            this.controller || (this.controller = makeStacksButton("".concat(scriptName, "-modal-controller"), "UserScripters", __assign(__assign({}, common), { type: "outlined", muted: true, classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
-                                    "bar0", "t128"
-                                ], false) })));
-                            this.modal || (this.modal = makeStacksExpandable("".concat(scriptName, "-modal"), this.controller, __assign(__assign({}, common), { classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
-                                    "z-modal",
-                                    "".concat(scriptName, "-modal"),
-                                ], false), contentClasses: ["ba", "bar-lg", "bc-black-075", "bg-white", "p16", "wmn3"], expanded: false })));
-                            contentElem = this.modal.querySelector(".s-expandable--content");
-                            if (!contentElem) {
-                                console.debug("[".concat(scriptName, "] missing modal content element"));
-                                return [2, this];
-                            }
-                            return [4, Promise.all(contentPromises)];
-                        case 1:
-                            content = _a.sent();
-                            clear(contentElem);
-                            contentElem.append.apply(contentElem, __spreadArray([], __read(content), false));
-                            return [2, this];
-                    }
-                });
-            });
-        };
-        Configurer.prototype.hide = function () {
-            var _a, _b;
-            if ((_a = this.modal) === null || _a === void 0 ? void 0 : _a.classList.contains("is-expanded")) {
-                (_b = this.controller) === null || _b === void 0 ? void 0 : _b.click();
-            }
-            return this;
-        };
-        Configurer.prototype.get = function (name) {
-            var scripts = this.scripts;
-            return scripts.get(name);
-        };
-        Configurer.prototype.register = function (name) {
-            var storage = this.storage;
-            var script = new Userscript(name, storage);
-            this.scripts.set(name, script);
-            this.render();
-            return script;
-        };
-        Configurer.prototype.show = function () {
-            var _a, _b;
-            if (!((_a = this.modal) === null || _a === void 0 ? void 0 : _a.classList.contains("is-expanded"))) {
-                (_b = this.controller) === null || _b === void 0 ? void 0 : _b.click();
-            }
-            return this;
-        };
-        Configurer.prototype.unregister = function (name) {
-            var scripts = this.scripts;
-            var script = scripts.get(name);
-            if (script) {
-                scripts.delete(name);
-                this.render();
-            }
-            return script;
-        };
-        return Configurer;
-    }());
-    var userscripters = unsafeWindow.UserScripters || (unsafeWindow.UserScripters = {});
-    var userscripts = userscripters.Userscripts || (userscripters.Userscripts = {});
-    var storage = Store.locateStorage();
-    var configurer = new Configurer(storage);
-    userscripts.Configurer || (userscripts.Configurer = configurer);
-    appendStyles();
-    configurer.render();
-}, { once: true });
+    });
+}); }, { once: true });
