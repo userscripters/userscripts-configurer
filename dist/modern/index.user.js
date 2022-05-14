@@ -338,7 +338,7 @@ window.addEventListener("load", async () => {
                 "checkbox": makeStacksCheckbox
             };
             const inputPromises = [...options].map(async ([key, option]) => {
-                const { desc, def, items = [], type = "text" } = option;
+                const { desc, def, items = [], title = "", type = "text" } = option;
                 const values = await this.load(key, def);
                 const isArr = Array.isArray(values);
                 const isBool = typeof values === "boolean";
@@ -355,7 +355,7 @@ window.addEventListener("load", async () => {
                         };
                     }),
                     description: desc,
-                    title: key,
+                    title: title || key,
                 };
                 if (!isArr && !isBool) {
                     options.value = values;

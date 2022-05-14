@@ -617,7 +617,7 @@ window.addEventListener("load", async () => {
             };
 
             const inputPromises = [...options].map(async ([key, option]) => {
-                const { desc, def, items = [], type = "text" } = option;
+                const { desc, def, items = [], title = "", type = "text" } = option;
 
                 const values = await this.load(key, def) as boolean | string | string[];
 
@@ -639,7 +639,7 @@ window.addEventListener("load", async () => {
                         };
                     }),
                     description: desc,
-                    title: key,
+                    title: title || key,
                 };
 
                 if (!isArr && !isBool) {

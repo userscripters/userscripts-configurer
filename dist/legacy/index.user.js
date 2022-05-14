@@ -456,15 +456,15 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                         inputPromises = __spreadArray([], __read(options), false).map(function (_a) {
                                             var _b = __read(_a, 2), key = _b[0], option = _b[1];
                                             return __awaiter(_this, void 0, void 0, function () {
-                                                var desc, def, _c, items, _d, type, values, isArr, isBool, inputName, options, _e, inputWrapper;
+                                                var desc, def, _c, items, _d, title, _e, type, values, isArr, isBool, inputName, options, _f, inputWrapper;
                                                 var _this = this;
-                                                return __generator(this, function (_f) {
-                                                    switch (_f.label) {
+                                                return __generator(this, function (_g) {
+                                                    switch (_g.label) {
                                                         case 0:
-                                                            desc = option.desc, def = option.def, _c = option.items, items = _c === void 0 ? [] : _c, _d = option.type, type = _d === void 0 ? "text" : _d;
+                                                            desc = option.desc, def = option.def, _c = option.items, items = _c === void 0 ? [] : _c, _d = option.title, title = _d === void 0 ? "" : _d, _e = option.type, type = _e === void 0 ? "text" : _e;
                                                             return [4, this.load(key, def)];
                                                         case 1:
-                                                            values = _f.sent();
+                                                            values = _g.sent();
                                                             isArr = Array.isArray(values);
                                                             isBool = typeof values === "boolean";
                                                             inputName = "".concat(scriptName, "-").concat(userscriptName, "-").concat(key);
@@ -475,7 +475,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                                     return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
                                                                 }),
                                                                 description: desc,
-                                                                title: key,
+                                                                title: title || key,
                                                             };
                                                             if (!isArr && !isBool) {
                                                                 options.value = values;
@@ -483,7 +483,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                             if (type === "toggle") {
                                                                 options.selected = !!values;
                                                             }
-                                                            _e = __read(handlerMap[type](inputName, options), 1), inputWrapper = _e[0];
+                                                            _f = __read(handlerMap[type](inputName, options), 1), inputWrapper = _f[0];
                                                             inputWrapper.addEventListener("change", function (_a) {
                                                                 var currentTarget = _a.currentTarget, target = _a.target;
                                                                 return __awaiter(_this, void 0, void 0, function () {

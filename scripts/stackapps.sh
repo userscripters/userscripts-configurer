@@ -29,34 +29,34 @@ script.option(
     {
         def: \"Welcome to Stack Overflow\",
         title: \"Greeting text\",
-        type: \"text\"
+        type: \"text\",
     }
 );
 
 // checkbox option
 script.option(\"prefer-diff-view\", {
-    type: \"checkbox\",
     items: [{
         label: \"Use diff view\",
         value: true
-    }]
+    }],
+    type: \"checkbox\",
 });
 
 //toggle option
 script.option(\"prefer-diff-view\", {
-    type: \"toggle\",
     selected: true,
-    title: \"Prefer diff view\"
+    title: \"Prefer diff view\",
+    type: \"toggle\",
 });
 
 // select option
 script.option(\"style\", {
-    type: \"select\",
-    title: \"Reference style\",
     items: [
         { label: \"Simple\", value: \"simple\" },
         { label: \"Full\", value: \"full\", selected: true }
-    ]
+    ],
+    title: \"Reference style\",
+    type: \"select\",
 });
 \`\`\`
 
