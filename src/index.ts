@@ -73,6 +73,11 @@ interface StacksSelectOptions extends StacksCommonOptions {
     value?: string;
 }
 
+interface StacksToggleOptions extends StacksCommonOptions {
+    selected?: boolean;
+    title: string;
+}
+
 window.addEventListener("load", async () => {
     const scriptName = "userscript-configurer";
 
@@ -414,6 +419,47 @@ window.addEventListener("load", async () => {
 
         svg.append(path);
         return [svg, path];
+    };
+
+    /**
+     * @see https://stackoverflow.design/product/components/toggle-switch/
+     *
+     * @summary creates a Stacks toggle
+     * @param id toggle id
+     * @param options configuration options
+     */
+    const makeStacksToggle = (
+        id: string,
+        options: StacksToggleOptions,
+    ): [HTMLDivElement, HTMLInputElement] => {
+        const {
+            classes = [],
+            selected = false,
+            title,
+        } = options;
+
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("d-flex", "ai-center", "gs8", ...classes);
+
+        const lbl = document.createElement("label");
+        lbl.classList.add("flex--item", "s-label");
+        lbl.htmlFor = id;
+        lbl.textContent = title;
+
+        const toggleWrapper = document.createElement("div");
+        toggleWrapper.classList.add("flex--item", "s-toggle-switch");
+
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.id = id;
+        input.checked = selected;
+
+        const lever = document.createElement("div");
+        lever.classList.add("s-toggle-switch--indicator");
+
+        toggleWrapper.append(input, lever);
+        wrapper.append(lbl, toggleWrapper);
+        return [wrapper, input];
     };
 
     /**
