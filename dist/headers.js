@@ -1,6 +1,6 @@
 // ==UserScript==
 // @author          Oleg Valter <oleg.a.valter@gmail.com>
-// @description     One configurer to setup them all
+// @description     One script to configure them all
 // @grant           GM_deleteValue
 // @grant           GM_getValue
 // @grant           GM_setValue
@@ -32,5 +32,5 @@
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         0.1.0
+// @version         1.0.0
 // ==/UserScript==
