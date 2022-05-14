@@ -138,7 +138,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 ;
 ;
 window.addEventListener("load", function () { return __awaiter(void 0, void 0, void 0, function () {
-    var scriptName, Store, clear, appendStyles, makeStacksButton, makeStacksExpandable, makeStacksTextInput, makeStacksCheckbox, makeStacksSelect, makeStacksIcon, makeStacksToggle, makeStacksToast, toggleToast, hideToast, showToast, isInputLike, isCheckedBox, Userscript, Configurer, userscripters, userscripts, storage, configurer;
+    var scriptName, Store, clear, appendStyles, makeStacksButton, makeStacksExpandable, makeStacksTextInput, makeStacksCheckbox, makeStacksSelect, makeStacksIcon, makeStacksToggle, makeStacksToast, toggleToast, hideToast, showToast, isInputLike, isCheckedBox, scase, prettifyName, Userscript, Configurer, userscripters, userscripts, storage, configurer;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -420,6 +420,8 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                 isCheckedBox = function (elem) {
                     return elem instanceof HTMLInputElement && elem.checked;
                 };
+                scase = function (text) { return text.slice(0, 1).toUpperCase() + text.slice(1).toLowerCase(); };
+                prettifyName = function (name) { return name.split(/[-.]/).map(scase).join(" "); };
                 Userscript = (function (_super) {
                     __extends(Userscript, _super);
                     function Userscript(name, storage) {
@@ -446,7 +448,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                         container.classList.add("".concat(scriptName, "-userscript"), "d-flex", "fd-column", "mb24");
                                         header = document.createElement("h2");
                                         header.classList.add("mb8");
-                                        header.textContent = userscriptName;
+                                        header.textContent = prettifyName(userscriptName);
                                         handlerMap = {
                                             "toggle": makeStacksToggle,
                                             "text": makeStacksTextInput,
@@ -475,7 +477,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                                     return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
                                                                 }),
                                                                 description: desc,
-                                                                title: title || key,
+                                                                title: title || prettifyName(key),
                                                             };
                                                             if (!isArr && !isBool) {
                                                                 options.value = values;

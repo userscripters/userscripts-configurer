@@ -572,6 +572,18 @@ window.addEventListener("load", async () => {
         return elem instanceof HTMLInputElement && elem.checked;
     };
 
+    /**
+     * @summary sentence-cases a string
+     * @param text text to sentence-case
+     */
+    const scase = (text: string) => text.slice(0, 1).toUpperCase() + text.slice(1).toLowerCase();
+
+    /**
+     * @summary prettifies a given name
+     * @param name name to prettify
+     */
+    const prettifyName = (name: string) => name.split(/[-.]/).map(scase).join(" ");
+
     class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store?.default {
 
         private container?: HTMLElement;
@@ -607,7 +619,7 @@ window.addEventListener("load", async () => {
 
             const header = document.createElement("h2");
             header.classList.add("mb8");
-            header.textContent = userscriptName;
+            header.textContent = prettifyName(userscriptName);
 
             const handlerMap = {
                 "toggle": makeStacksToggle,
@@ -639,7 +651,7 @@ window.addEventListener("load", async () => {
                         };
                     }),
                     description: desc,
-                    title: title || key,
+                    title: title || prettifyName(key),
                 };
 
                 if (!isArr && !isBool) {

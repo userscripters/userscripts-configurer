@@ -312,6 +312,8 @@ window.addEventListener("load", async () => {
     const isCheckedBox = (elem) => {
         return elem instanceof HTMLInputElement && elem.checked;
     };
+    const scase = (text) => text.slice(0, 1).toUpperCase() + text.slice(1).toLowerCase();
+    const prettifyName = (name) => name.split(/[-.]/).map(scase).join(" ");
     class Userscript extends (Store === null || Store === void 0 ? void 0 : Store.default) {
         constructor(name, storage) {
             super(name, storage);
@@ -330,7 +332,7 @@ window.addEventListener("load", async () => {
             container.classList.add(`${scriptName}-userscript`, "d-flex", "fd-column", "mb24");
             const header = document.createElement("h2");
             header.classList.add("mb8");
-            header.textContent = userscriptName;
+            header.textContent = prettifyName(userscriptName);
             const handlerMap = {
                 "toggle": makeStacksToggle,
                 "text": makeStacksTextInput,
@@ -355,7 +357,7 @@ window.addEventListener("load", async () => {
                         };
                     }),
                     description: desc,
-                    title: title || key,
+                    title: title || prettifyName(key),
                 };
                 if (!isArr && !isBool) {
                     options.value = values;
