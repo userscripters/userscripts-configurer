@@ -32,7 +32,7 @@
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.0.2
+// @version         1.0.3
 // ==/UserScript==
 
 "use strict";
@@ -318,12 +318,13 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                     wrapper.append(selectWrapper);
                     return [wrapper, select];
                 };
-                makeStacksIcon = function (name, pathConfig, _a) {
-                    var _b;
-                    var _c = _a === void 0 ? {} : _a, _d = _c.classes, classes = _d === void 0 ? [] : _d, _e = _c.width, width = _e === void 0 ? 14 : _e, _f = _c.height, height = _f === void 0 ? width : _f;
+                makeStacksIcon = function (name, pathConfig, options) {
+                    var _a;
+                    if (options === void 0) { options = {}; }
+                    var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.width, width = _c === void 0 ? 14 : _c, _d = options.height, height = _d === void 0 ? width : _d;
                     var ns = "http://www.w3.org/2000/svg";
                     var svg = document.createElementNS(ns, "svg");
-                    (_b = svg.classList).add.apply(_b, __spreadArray(["svg-icon", name], __read(classes), false));
+                    (_a = svg.classList).add.apply(_a, __spreadArray(["svg-icon", name], __read(classes), false));
                     svg.setAttribute("width", width.toString());
                     svg.setAttribute("height", height.toString());
                     svg.setAttribute("viewBox", "0 0 ".concat(width, " ").concat(height));

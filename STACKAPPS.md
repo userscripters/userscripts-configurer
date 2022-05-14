@@ -4,7 +4,7 @@ script posts
 
 
 <!-- thumbnail: https://i.stack.imgur.com/Rdcrd.png -->
-<!-- version: 1.0.2 -->
+<!-- version: 1.0.3 -->
 <!-- tag: script -->
 <!-- excerpt: UserScripts Configurer provides a shared UI and controls configuration options for UserScripters' userscripts. -->
 
@@ -84,7 +84,7 @@ The script is licensed under the [GPL-3.0-or-later](https://spdx.org/licenses/GP
 
 ### Download
 
-Latest version: 1.0.2
+Latest version: 1.0.3
 
 [Install](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.user.js) | [Minified](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.min.user.js)
 
@@ -106,7 +106,7 @@ Supported userscript managers:
 
 | Version    | Description |
 | ---------- | ----------- |
-| 1.0.2 |             |
+| 1.0.3 |             |
 
 ## Contact
 

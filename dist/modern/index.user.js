@@ -32,7 +32,7 @@
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.0.2
+// @version         1.0.3
 // ==/UserScript==
 
 "use strict";
@@ -219,7 +219,8 @@ window.addEventListener("load", async () => {
         wrapper.append(selectWrapper);
         return [wrapper, select];
     };
-    const makeStacksIcon = (name, pathConfig, { classes = [], width = 14, height = width } = {}) => {
+    const makeStacksIcon = (name, pathConfig, options = {}) => {
+        const { classes = [], width = 14, height = width, } = options;
         const ns = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(ns, "svg");
         svg.classList.add("svg-icon", name, ...classes);
