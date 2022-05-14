@@ -4,7 +4,7 @@ script posts
 
 
 <!-- thumbnail: https://i.stack.imgur.com/Rdcrd.png -->
-<!-- version: 1.0.1 -->
+<!-- version: 1.0.2 -->
 <!-- tag: script -->
 <!-- excerpt: UserScripts Configurer provides a shared UI and controls configuration options for UserScripters' userscripts. -->
 
@@ -44,34 +44,34 @@ script.option(
     {
         def: "Welcome to Stack Overflow",
         title: "Greeting text",
-        type: "text"
+        type: "text",
     }
 );
 
 // checkbox option
 script.option("prefer-diff-view", {
-    type: "checkbox",
     items: [{
         label: "Use diff view",
         value: true
-    }]
+    }],
+    type: "checkbox",
 });
 
 //toggle option
 script.option("prefer-diff-view", {
-    type: "toggle",
     selected: true,
-    title: "Prefer diff view"
+    title: "Prefer diff view",
+    type: "toggle",
 });
 
 // select option
 script.option("style", {
-    type: "select",
-    title: "Reference style",
     items: [
         { label: "Simple", value: "simple" },
         { label: "Full", value: "full", selected: true }
-    ]
+    ],
+    title: "Reference style",
+    type: "select",
 });
 ```
 
@@ -84,7 +84,7 @@ The script is licensed under the [GPL-3.0-or-later](https://spdx.org/licenses/GP
 
 ### Download
 
-Latest version: 1.0.1
+Latest version: 1.0.2
 
 [Install](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.user.js) | [Minified](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.min.user.js)
 
@@ -106,7 +106,7 @@ Supported userscript managers:
 
 | Version    | Description |
 | ---------- | ----------- |
-| 1.0.1 |             |
+| 1.0.2 |             |
 
 ## Contact
 
