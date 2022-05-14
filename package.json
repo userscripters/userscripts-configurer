@@ -1,7 +1,7 @@
 {
     "name": "@userscripters/userscripts-configurer",
     "version": "0.1.0",
-    "description": "One configurer to setup them all",
+    "description": "One script to configure them all",
     "scripts": {
         "test": "mocha",
         "lint": "eslint src --fix --ext .js,.ts",
@@ -14,7 +14,8 @@
         "build-all": "bash ./scripts/build.sh",
         "headers-tm": "bash ./scripts/headers.sh",
         "readme": "bash ./scripts/readme.sh",
-        "postversion": "bash ./scripts/postversion.sh"
+        "postversion": "bash ./scripts/postversion.sh",
+        "stackapps": "bash ./scripts/stackapps.sh"
     },
     "repository": {
         "type": "git",
@@ -46,6 +47,7 @@
         "@typescript-eslint/parser": "^5.21.0",
         "@userscripters/generate-headers": "^2.12.1",
         "@userscripters/generate-readme": "^2.3.1",
+        "@userscripters/generate-stackapps": "^1.2.0",
         "@userscripters/global-types": "^0.2.7",
         "@userscripters/stackexchange-global-types": "^2.4.1",
         "@userscripters/storage": "^0.1.2",
