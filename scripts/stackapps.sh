@@ -13,10 +13,11 @@ const configurer = UserScripters.Userscripts.Configurer;
 const script = configurer.register(\"Auto Review Comments\");
 \`\`\`
 
-The method will return an instance of \`Userscript\` to which options (if any) can be added by calling its \`option\` method with 2 parameters. The 1<sup>st</sup> is the option's name, the 2<sup>nd</sup> is its configuration. The configurer currently supports 3 types of options (\`type\` field):
+The method will return an instance of \`Userscript\` to which options (if any) can be added by calling its \`option\` method with 2 parameters. The 1<sup>st</sup> is the option's name, the 2<sup>nd</sup> is its configuration. The configurer currently supports 4 types of options (\`type\` field):
 
 - text input
 - checkboxes
+- toggle switch
 - select
 
 Option config interface (as well as the interface of the Configurer itself) is described by our [Global Types](https://github.com/userscripters/global-types) type definitions package.
@@ -41,6 +42,13 @@ script.option(\"prefer-diff-view\", {
     }]
 });
 
+//toggle option
+script.option(\"prefer-diff-view\", {
+    type: \"toggle\",
+    selected: true,
+    title: \"Prefer diff view\"
+});
+
 // select option
 script.option(\"style\", {
     type: \"select\",
@@ -49,7 +57,7 @@ script.option(\"style\", {
         { label: \"Simple\", value: \"simple\" },
         { label: \"Full\", value: \"full\", selected: true }
     ]
-})
+});
 \`\`\`
 
 The Configurer uses a [userscript manager-agnostic storage](https://github.com/userscripters/storage) that also works with \`localStorage\` if manager storages are inaccessible.
