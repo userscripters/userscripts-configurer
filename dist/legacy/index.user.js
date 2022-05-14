@@ -138,7 +138,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 ;
 ;
 window.addEventListener("load", function () { return __awaiter(void 0, void 0, void 0, function () {
-    var scriptName, Store, clear, appendStyles, makeStacksButton, makeStacksExpandable, makeStacksTextInput, makeStacksCheckbox, makeStacksSelect, makeStacksIcon, makeStacksToggle, makeStacksToast, toggleToast, hideToast, showToast, isInputLike, isCheckedBox, scase, prettifyName, Userscript, Configurer, userscripters, userscripts, storage, configurer;
+    var scriptName, Store, clear, appendStyles, makeStacksButton, makeStacksExpandable, makeStacksTextInput, makeStacksCheckbox, makeStacksSelect, makeStacksIcon, makeStacksToggle, makeStacksToast, toggleToast, hideToast, showToast, isInputLike, isCheckedBox, scase, prettifyName, UserscriptOption, Userscript, Configurer, userscripters, userscripts, storage, configurer;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -423,6 +423,88 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                 };
                 scase = function (text) { return text.slice(0, 1).toUpperCase() + text.slice(1).toLowerCase(); };
                 prettifyName = function (name) { return name.split(/[-.]/).map(scase).join(" "); };
+                UserscriptOption = (function () {
+                    function UserscriptOption(script, config) {
+                        this.script = script;
+                        this.config = config;
+                    }
+                    UserscriptOption.prototype.render = function () {
+                        return __awaiter(this, void 0, void 0, function () {
+                            var _a, config, script, handlerMap, desc, def, name, _b, items, _c, title, _d, type, values, isArr, isBool, inputName, options, _e, inputWrapper;
+                            var _this = this;
+                            return __generator(this, function (_f) {
+                                switch (_f.label) {
+                                    case 0:
+                                        _a = this, config = _a.config, script = _a.script;
+                                        handlerMap = {
+                                            "toggle": makeStacksToggle,
+                                            "text": makeStacksTextInput,
+                                            "select": makeStacksSelect,
+                                            "checkbox": makeStacksCheckbox
+                                        };
+                                        desc = config.desc, def = config.def, name = config.name, _b = config.items, items = _b === void 0 ? [] : _b, _c = config.title, title = _c === void 0 ? "" : _c, _d = config.type, type = _d === void 0 ? "text" : _d;
+                                        return [4, script.load(name, def)];
+                                    case 1:
+                                        values = _f.sent();
+                                        isArr = Array.isArray(values);
+                                        isBool = typeof values === "boolean";
+                                        inputName = "".concat(scriptName, "-").concat(script.name, "-").concat(name);
+                                        options = {
+                                            classes: ["".concat(scriptName, "-userscript-option"), "mb16"],
+                                            items: items.map(function (item, idx) {
+                                                var value = item.value, name = item.name, selected = item.selected, rest = __rest(item, ["value", "name", "selected"]);
+                                                return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
+                                            }),
+                                            description: desc,
+                                            title: title || prettifyName(name),
+                                        };
+                                        if (!isArr && !isBool) {
+                                            options.value = values;
+                                        }
+                                        if (type === "toggle") {
+                                            options.selected = !!values;
+                                        }
+                                        _e = __read(handlerMap[type](inputName, options), 1), inputWrapper = _e[0];
+                                        this.container = inputWrapper;
+                                        inputWrapper.addEventListener("change", function (_a) {
+                                            var currentTarget = _a.currentTarget, target = _a.target;
+                                            return __awaiter(_this, void 0, void 0, function () {
+                                                var actualTarget, value;
+                                                var _b;
+                                                return __generator(this, function (_c) {
+                                                    switch (_c.label) {
+                                                        case 0:
+                                                            if (!isInputLike(target))
+                                                                return [2];
+                                                            actualTarget = currentTarget instanceof HTMLFieldSetElement ?
+                                                                { value: __spreadArray([], __read(currentTarget.elements), false).filter(isCheckedBox).map(function (e) { return e.value; }) } :
+                                                                target;
+                                                            value = type === "toggle" && actualTarget instanceof HTMLInputElement ?
+                                                                actualTarget.checked :
+                                                                actualTarget.value;
+                                                            return [4, script.save(name, value)];
+                                                        case 1:
+                                                            _c.sent();
+                                                            (_b = script.container) === null || _b === void 0 ? void 0 : _b.dispatchEvent(new CustomEvent("".concat(scriptName, "-success"), {
+                                                                bubbles: true,
+                                                                detail: {
+                                                                    name: name,
+                                                                    script: scriptName,
+                                                                    value: value
+                                                                }
+                                                            }));
+                                                            return [2];
+                                                    }
+                                                });
+                                            });
+                                        });
+                                        return [2, inputWrapper];
+                                }
+                            });
+                        });
+                    };
+                    return UserscriptOption;
+                }());
                 Userscript = (function (_super) {
                     __extends(Userscript, _super);
                     function Userscript(name, storage) {
@@ -433,13 +515,13 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         return _this;
                     }
                     Userscript.prototype.option = function (name, config) {
-                        this.options.set(name, __assign({ name: name }, config));
+                        this.options.set(name, new UserscriptOption(this, __assign({ name: name }, config)));
                         this.render();
                         return this;
                     };
                     Userscript.prototype.render = function () {
                         return __awaiter(this, void 0, void 0, function () {
-                            var _a, userscriptName, options, container, header, handlerMap, inputPromises, inputs, empty;
+                            var _a, userscriptName, options, container, header, inputPromises, inputs, empty;
                             var _this = this;
                             return __generator(this, function (_b) {
                                 switch (_b.label) {
@@ -449,78 +531,9 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                         container.classList.add("".concat(scriptName, "-userscript"), "d-flex", "fd-column", "mb24");
                                         header = document.createElement("h2");
                                         header.textContent = prettifyName(userscriptName);
-                                        handlerMap = {
-                                            "toggle": makeStacksToggle,
-                                            "text": makeStacksTextInput,
-                                            "select": makeStacksSelect,
-                                            "checkbox": makeStacksCheckbox
-                                        };
                                         inputPromises = __spreadArray([], __read(options), false).map(function (_a) {
-                                            var _b = __read(_a, 2), key = _b[0], option = _b[1];
-                                            return __awaiter(_this, void 0, void 0, function () {
-                                                var desc, def, _c, items, _d, title, _e, type, values, isArr, isBool, inputName, options, _f, inputWrapper;
-                                                var _this = this;
-                                                return __generator(this, function (_g) {
-                                                    switch (_g.label) {
-                                                        case 0:
-                                                            desc = option.desc, def = option.def, _c = option.items, items = _c === void 0 ? [] : _c, _d = option.title, title = _d === void 0 ? "" : _d, _e = option.type, type = _e === void 0 ? "text" : _e;
-                                                            return [4, this.load(key, def)];
-                                                        case 1:
-                                                            values = _g.sent();
-                                                            isArr = Array.isArray(values);
-                                                            isBool = typeof values === "boolean";
-                                                            inputName = "".concat(scriptName, "-").concat(userscriptName, "-").concat(key);
-                                                            options = {
-                                                                classes: ["".concat(scriptName, "-userscript-option"), "mb16"],
-                                                                items: items.map(function (item, idx) {
-                                                                    var value = item.value, name = item.name, selected = item.selected, rest = __rest(item, ["value", "name", "selected"]);
-                                                                    return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
-                                                                }),
-                                                                description: desc,
-                                                                title: title || prettifyName(key),
-                                                            };
-                                                            if (!isArr && !isBool) {
-                                                                options.value = values;
-                                                            }
-                                                            if (type === "toggle") {
-                                                                options.selected = !!values;
-                                                            }
-                                                            _f = __read(handlerMap[type](inputName, options), 1), inputWrapper = _f[0];
-                                                            inputWrapper.addEventListener("change", function (_a) {
-                                                                var currentTarget = _a.currentTarget, target = _a.target;
-                                                                return __awaiter(_this, void 0, void 0, function () {
-                                                                    var actualTarget, value;
-                                                                    return __generator(this, function (_b) {
-                                                                        switch (_b.label) {
-                                                                            case 0:
-                                                                                if (!isInputLike(target))
-                                                                                    return [2];
-                                                                                actualTarget = currentTarget instanceof HTMLFieldSetElement ?
-                                                                                    { value: __spreadArray([], __read(currentTarget.elements), false).filter(isCheckedBox).map(function (e) { return e.value; }) } :
-                                                                                    target;
-                                                                                value = type === "toggle" && actualTarget instanceof HTMLInputElement ?
-                                                                                    actualTarget.checked :
-                                                                                    actualTarget.value;
-                                                                                return [4, this.save(key, value)];
-                                                                            case 1:
-                                                                                _b.sent();
-                                                                                container.dispatchEvent(new CustomEvent("".concat(scriptName, "-success"), {
-                                                                                    bubbles: true,
-                                                                                    detail: {
-                                                                                        key: key,
-                                                                                        script: scriptName,
-                                                                                        value: value
-                                                                                    }
-                                                                                }));
-                                                                                return [2];
-                                                                        }
-                                                                    });
-                                                                });
-                                                            });
-                                                            return [2, inputWrapper];
-                                                    }
-                                                });
-                                            });
+                                            var _b = __read(_a, 2), _ = _b[0], option = _b[1];
+                                            return option.render();
                                         });
                                         if (!inputPromises.length) {
                                             header.classList.add("mb8");

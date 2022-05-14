@@ -623,10 +623,105 @@ window.addEventListener("load", async () => {
      */
     const prettifyName = (name: string) => name.split(/[-.]/).map(scase).join(" ");
 
+    class UserscriptOption<T extends Storage | UserScripters.AsyncStorage> {
+
+        /**
+         * @summary container element
+         */
+        public container?: HTMLElement;
+
+        /**
+         * @param script containing {@link Userscript}
+         * @param config configuration options
+         */
+        constructor(
+            private script: Userscript<T>,
+            private config: UserScripters.UserscriptOption
+        ) { }
+
+        /**
+         * @summary renders the option
+         */
+        async render() {
+            const { config, script } = this;
+
+            const handlerMap = {
+                "toggle": makeStacksToggle,
+                "text": makeStacksTextInput,
+                "select": makeStacksSelect,
+                "checkbox": makeStacksCheckbox
+            };
+
+            const { desc, def, name, items = [], title = "", type = "text" } = config;
+
+            const values = await script.load(name, def) as boolean | string | string[];
+
+            const isArr = Array.isArray(values);
+            const isBool = typeof values === "boolean";
+
+            const inputName = `${scriptName}-${script.name}-${name}`;
+
+            const options: StacksSelectOptions & StacksTextInputOptions & StacksCheckboxOptions & StacksToggleOptions = {
+                classes: [`${scriptName}-userscript-option`, "mb16"],
+                items: items.map((item, idx) => {
+                    const { value, name, selected, ...rest } = item;
+
+                    return {
+                        ...rest,
+                        name: name || `${inputName}-item-${idx}`,
+                        selected: isArr && value !== void 0 ? values.includes(value) : selected,
+                        value
+                    };
+                }),
+                description: desc,
+                title: title || prettifyName(name),
+            };
+
+            if (!isArr && !isBool) {
+                options.value = values;
+            }
+
+            if (type === "toggle") {
+                options.selected = !!values;
+            }
+
+            const [inputWrapper] = handlerMap[type](inputName, options);
+
+            this.container = inputWrapper; //TODO: partial rerender
+
+            inputWrapper.addEventListener("change", async ({ currentTarget, target }) => {
+                if (!isInputLike(target)) return;
+
+                const actualTarget = currentTarget instanceof HTMLFieldSetElement ?
+                    { value: [...currentTarget.elements].filter(isCheckedBox).map((e) => e.value) } :
+                    target;
+
+                const value = type === "toggle" && actualTarget instanceof HTMLInputElement ?
+                    actualTarget.checked :
+                    actualTarget.value;
+
+                await script.save(name, value);
+
+                script.container?.dispatchEvent(
+                    new CustomEvent(`${scriptName}-success`, {
+                        bubbles: true,
+                        detail: {
+                            name,
+                            script: scriptName,
+                            value
+                        }
+                    })
+                );
+            });
+
+            return inputWrapper;
+        }
+    }
+
     class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store?.default {
 
-        private container?: HTMLElement;
-        private options = new Map<string, UserScripters.UserscriptOption>();
+        public container?: HTMLElement;
+        private options = new Map<string, UserscriptOption<T>>();
         private toast?: HTMLElement;
 
         constructor(public name: string, public storage: T) {
@@ -639,7 +734,7 @@ window.addEventListener("load", async () => {
          * @param config configuration options
          */
         option(name: string, config: Omit<UserScripters.UserscriptOption, "name">) {
-            this.options.set(name, { name, ...config });
+            this.options.set(name, new UserscriptOption(this, { name, ...config }));
             this.render();
             return this;
         }
@@ -659,76 +754,7 @@ window.addEventListener("load", async () => {
             const header = document.createElement("h2");
             header.textContent = prettifyName(userscriptName);
 
-            const handlerMap = {
-                "toggle": makeStacksToggle,
-                "text": makeStacksTextInput,
-                "select": makeStacksSelect,
-                "checkbox": makeStacksCheckbox
-            };
-
-            const inputPromises = [...options].map(async ([key, option]) => {
-                const { desc, def, items = [], title = "", type = "text" } = option;
-
-                const values = await this.load(key, def) as boolean | string | string[];
-
-                const isArr = Array.isArray(values);
-                const isBool = typeof values === "boolean";
-
-                const inputName = `${scriptName}-${userscriptName}-${key}`;
-
-                const options: StacksSelectOptions & StacksTextInputOptions & StacksCheckboxOptions & StacksToggleOptions = {
-                    classes: [`${scriptName}-userscript-option`, "mb16"],
-                    items: items.map((item, idx) => {
-                        const { value, name, selected, ...rest } = item;
-
-                        return {
-                            ...rest,
-                            name: name || `${inputName}-item-${idx}`,
-                            selected: isArr && value !== void 0 ? values.includes(value) : selected,
-                            value
-                        };
-                    }),
-                    description: desc,
-                    title: title || prettifyName(key),
-                };
-
-                if (!isArr && !isBool) {
-                    options.value = values;
-                }
-
-                if (type === "toggle") {
-                    options.selected = !!values;
-                }
-
-                const [inputWrapper] = handlerMap[type](inputName, options);
-
-                inputWrapper.addEventListener("change", async ({ currentTarget, target }) => {
-                    if (!isInputLike(target)) return;
-
-                    const actualTarget = currentTarget instanceof HTMLFieldSetElement ?
-                        { value: [...currentTarget.elements].filter(isCheckedBox).map((e) => e.value) } :
-                        target;
-
-                    const value = type === "toggle" && actualTarget instanceof HTMLInputElement ?
-                        actualTarget.checked :
-                        actualTarget.value;
-
-                    await this.save(key, value);
-
-                    container.dispatchEvent(
-                        new CustomEvent(`${scriptName}-success`, {
-                            bubbles: true,
-                            detail: {
-                                key,
-                                script: scriptName,
-                                value
-                            }
-                        })
-                    );
-                });
-
-                return inputWrapper;
-            });
+            const inputPromises = [...options].map(([_, option]) => option.render());
 
             if (!inputPromises.length) {
                 header.classList.add("mb8");
