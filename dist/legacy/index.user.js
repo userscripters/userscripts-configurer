@@ -138,7 +138,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 ;
 ;
 window.addEventListener("load", function () { return __awaiter(void 0, void 0, void 0, function () {
-    var scriptName, Store, clear, appendStyles, makeStacksButton, makeStacksExpandable, makeStacksTextInput, makeStacksCheckbox, makeStacksSelect, makeStacksIcon, makeStacksToast, toggleToast, hideToast, showToast, isInputLike, isCheckedBox, Userscript, Configurer, userscripters, userscripts, storage, configurer;
+    var scriptName, Store, clear, appendStyles, makeStacksButton, makeStacksExpandable, makeStacksTextInput, makeStacksCheckbox, makeStacksSelect, makeStacksIcon, makeStacksToggle, makeStacksToast, toggleToast, hideToast, showToast, isInputLike, isCheckedBox, Userscript, Configurer, userscripters, userscripts, storage, configurer;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -333,6 +333,27 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                     svg.append(path);
                     return [svg, path];
                 };
+                makeStacksToggle = function (id, options) {
+                    var _a;
+                    var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.selected, selected = _c === void 0 ? false : _c, title = options.title;
+                    var wrapper = document.createElement("div");
+                    (_a = wrapper.classList).add.apply(_a, __spreadArray(["d-flex", "ai-center", "gs8"], __read(classes), false));
+                    var lbl = document.createElement("label");
+                    lbl.classList.add("flex--item", "s-label");
+                    lbl.htmlFor = id;
+                    lbl.textContent = title;
+                    var toggleWrapper = document.createElement("div");
+                    toggleWrapper.classList.add("flex--item", "s-toggle-switch");
+                    var input = document.createElement("input");
+                    input.type = "checkbox";
+                    input.id = id;
+                    input.checked = selected;
+                    var lever = document.createElement("div");
+                    lever.classList.add("s-toggle-switch--indicator");
+                    toggleWrapper.append(input, lever);
+                    wrapper.append(lbl, toggleWrapper);
+                    return [wrapper, input];
+                };
                 makeStacksToast = function (id, text, options) {
                     var _a, _b;
                     if (options === void 0) { options = {}; }
@@ -427,6 +448,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                         header.classList.add("mb8");
                                         header.textContent = userscriptName;
                                         handlerMap = {
+                                            "toggle": makeStacksToggle,
                                             "text": makeStacksTextInput,
                                             "select": makeStacksSelect,
                                             "checkbox": makeStacksCheckbox
@@ -434,7 +456,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                         inputPromises = __spreadArray([], __read(options), false).map(function (_a) {
                                             var _b = __read(_a, 2), key = _b[0], option = _b[1];
                                             return __awaiter(_this, void 0, void 0, function () {
-                                                var desc, def, _c, items, _d, type, values, isArr, inputName, options, _e, inputWrapper;
+                                                var desc, def, _c, items, _d, type, values, isArr, isBool, inputName, options, _e, inputWrapper;
                                                 var _this = this;
                                                 return __generator(this, function (_f) {
                                                     switch (_f.label) {
@@ -444,6 +466,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                         case 1:
                                                             values = _f.sent();
                                                             isArr = Array.isArray(values);
+                                                            isBool = typeof values === "boolean";
                                                             inputName = "".concat(scriptName, "-").concat(userscriptName, "-").concat(key);
                                                             options = {
                                                                 classes: ["".concat(scriptName, "-userscript-option"), "mb12"],
@@ -454,21 +477,28 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                                 description: desc,
                                                                 title: key,
                                                             };
-                                                            if (!isArr)
+                                                            if (!isArr && !isBool) {
                                                                 options.value = values;
+                                                            }
+                                                            if (type === "toggle") {
+                                                                options.selected = !!values;
+                                                            }
                                                             _e = __read(handlerMap[type](inputName, options), 1), inputWrapper = _e[0];
                                                             inputWrapper.addEventListener("change", function (_a) {
                                                                 var currentTarget = _a.currentTarget, target = _a.target;
                                                                 return __awaiter(_this, void 0, void 0, function () {
-                                                                    var value;
+                                                                    var actualTarget, value;
                                                                     return __generator(this, function (_b) {
                                                                         switch (_b.label) {
                                                                             case 0:
                                                                                 if (!isInputLike(target))
                                                                                     return [2];
-                                                                                value = (currentTarget instanceof HTMLFieldSetElement ?
+                                                                                actualTarget = currentTarget instanceof HTMLFieldSetElement ?
                                                                                     { value: __spreadArray([], __read(currentTarget.elements), false).filter(isCheckedBox).map(function (e) { return e.value; }) } :
-                                                                                    target).value;
+                                                                                    target;
+                                                                                value = type === "toggle" && actualTarget instanceof HTMLInputElement ?
+                                                                                    actualTarget.checked :
+                                                                                    actualTarget.value;
                                                                                 return [4, this.save(key, value)];
                                                                             case 1:
                                                                                 _b.sent();

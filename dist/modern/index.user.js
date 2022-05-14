@@ -232,6 +232,26 @@ window.addEventListener("load", async () => {
         svg.append(path);
         return [svg, path];
     };
+    const makeStacksToggle = (id, options) => {
+        const { classes = [], selected = false, title, } = options;
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("d-flex", "ai-center", "gs8", ...classes);
+        const lbl = document.createElement("label");
+        lbl.classList.add("flex--item", "s-label");
+        lbl.htmlFor = id;
+        lbl.textContent = title;
+        const toggleWrapper = document.createElement("div");
+        toggleWrapper.classList.add("flex--item", "s-toggle-switch");
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.id = id;
+        input.checked = selected;
+        const lever = document.createElement("div");
+        lever.classList.add("s-toggle-switch--indicator");
+        toggleWrapper.append(input, lever);
+        wrapper.append(lbl, toggleWrapper);
+        return [wrapper, input];
+    };
     const makeStacksToast = (id, text, options = {}) => {
         const { buttons = [], classes = [], important = false, msgClasses = [], parent, type = "none", } = options;
         const wrap = document.createElement("div");
@@ -312,6 +332,7 @@ window.addEventListener("load", async () => {
             header.classList.add("mb8");
             header.textContent = userscriptName;
             const handlerMap = {
+                "toggle": makeStacksToggle,
                 "text": makeStacksTextInput,
                 "select": makeStacksSelect,
                 "checkbox": makeStacksCheckbox
@@ -320,6 +341,7 @@ window.addEventListener("load", async () => {
                 const { desc, def, items = [], type = "text" } = option;
                 const values = await this.load(key, def);
                 const isArr = Array.isArray(values);
+                const isBool = typeof values === "boolean";
                 const inputName = `${scriptName}-${userscriptName}-${key}`;
                 const options = {
                     classes: [`${scriptName}-userscript-option`, "mb12"],
@@ -335,15 +357,22 @@ window.addEventListener("load", async () => {
                     description: desc,
                     title: key,
                 };
-                if (!isArr)
+                if (!isArr && !isBool) {
                     options.value = values;
+                }
+                if (type === "toggle") {
+                    options.selected = !!values;
+                }
                 const [inputWrapper] = handlerMap[type](inputName, options);
                 inputWrapper.addEventListener("change", async ({ currentTarget, target }) => {
                     if (!isInputLike(target))
                         return;
-                    const { value } = currentTarget instanceof HTMLFieldSetElement ?
+                    const actualTarget = currentTarget instanceof HTMLFieldSetElement ?
                         { value: [...currentTarget.elements].filter(isCheckedBox).map((e) => e.value) } :
                         target;
+                    const value = type === "toggle" && actualTarget instanceof HTMLInputElement ?
+                        actualTarget.checked :
+                        actualTarget.value;
                     await this.save(key, value);
                     container.dispatchEvent(new CustomEvent(`${scriptName}-success`, {
                         bubbles: true,

@@ -610,6 +610,7 @@ window.addEventListener("load", async () => {
             header.textContent = userscriptName;
 
             const handlerMap = {
+                "toggle": makeStacksToggle,
                 "text": makeStacksTextInput,
                 "select": makeStacksSelect,
                 "checkbox": makeStacksCheckbox
@@ -618,13 +619,14 @@ window.addEventListener("load", async () => {
             const inputPromises = [...options].map(async ([key, option]) => {
                 const { desc, def, items = [], type = "text" } = option;
 
-                const values = await this.load(key, def) as string | string[];
+                const values = await this.load(key, def) as boolean | string | string[];
 
                 const isArr = Array.isArray(values);
+                const isBool = typeof values === "boolean";
 
                 const inputName = `${scriptName}-${userscriptName}-${key}`;
 
-                const options: StacksSelectOptions & StacksTextInputOptions & StacksCheckboxOptions = {
+                const options: StacksSelectOptions & StacksTextInputOptions & StacksCheckboxOptions & StacksToggleOptions = {
                     classes: [`${scriptName}-userscript-option`, "mb12"],
                     items: items.map((item, idx) => {
                         const { value, name, selected, ...rest } = item;
@@ -640,16 +642,26 @@ window.addEventListener("load", async () => {
                     title: key,
                 };
 
-                if (!isArr) options.value = values;
+                if (!isArr && !isBool) {
+                    options.value = values;
+                }
+
+                if (type === "toggle") {
+                    options.selected = !!values;
+                }
 
                 const [inputWrapper] = handlerMap[type](inputName, options);
 
                 inputWrapper.addEventListener("change", async ({ currentTarget, target }) => {
                     if (!isInputLike(target)) return;
 
-                    const { value } = currentTarget instanceof HTMLFieldSetElement ?
+                    const actualTarget = currentTarget instanceof HTMLFieldSetElement ?
                         { value: [...currentTarget.elements].filter(isCheckedBox).map((e) => e.value) } :
                         target;
+
+                    const value = type === "toggle" && actualTarget instanceof HTMLInputElement ?
+                        actualTarget.checked :
+                        actualTarget.value;
 
                     await this.save(key, value);
 
