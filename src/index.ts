@@ -87,8 +87,15 @@ window.addEventListener("load", async () => {
         return;
     }
 
+    /**
+     * @summary clears an {@link Element} of all children
+     * @param elem element to clear
+     */
     const clear = (elem: Element) => [...elem.children].forEach((c) => c.remove());
 
+    /**
+     * @summary injects script-specific styles into the page
+     */
     const appendStyles = () => {
         const style = document.createElement("style");
         document.head.append(style);
@@ -207,6 +214,7 @@ window.addEventListener("load", async () => {
 
     /**
      * @see https://stackoverflow.design/product/components/inputs/
+     *
      * @summary makes Stacks text input
      * @param id input id
      * @param options input configuration
@@ -267,6 +275,8 @@ window.addEventListener("load", async () => {
 
     /**
      * @see https://stackoverflow.design/product/components/checkbox/
+     *
+     * @summary makes a Stacks checkbox group
      * @param id id of the checkbox container
      * @param options configuration options
      */
@@ -326,8 +336,9 @@ window.addEventListener("load", async () => {
     };
 
     /**
-     * @see https://stackoverflow.design/product/components/checkbox/
+     * @see https://stackoverflow.design/product/components/select/
      *
+     * @summary makes a Stacks select
      * @param id select id
      * @param options configuration options
      */
@@ -398,13 +409,23 @@ window.addEventListener("load", async () => {
 
     /**
      * @see https://stackoverflow.design/product/resources/icons/
+     *
      * @summary makes Stacks 18 x 18 icon
+     * @param name icon class name
+     * @param pathConfig <path> element `d` attribute
+     * @param options configuration options
      */
     const makeStacksIcon = (
         name: string,
         pathConfig: string,
-        { classes = [], width = 14, height = width }: StacksIconOptions = {}
+        options: StacksIconOptions = {}
     ) => {
+        const {
+            classes = [],
+            width = 14,
+            height = width,
+        } = options;
+
         const ns = "http://www.w3.org/2000/svg";
 
         const svg = document.createElementNS(ns, "svg");
@@ -464,7 +485,11 @@ window.addEventListener("load", async () => {
 
     /**
      * @see https://stackoverflow.design/product/components/notices/
+     *
      * @summary builder for Stacks notifications
+     * @param id toast id
+     * @param text text to display
+     * @param options configuration options
      */
     const makeStacksToast = (
         id: string,
@@ -532,6 +557,8 @@ window.addEventListener("load", async () => {
 
     /**
      * @summary toggles the Stacks toast visibility
+     * @param target toast to toggle the state of
+     * @param show optional current toast state
      */
     const toggleToast = (target: string | Element, show?: boolean) => {
         const toast =
@@ -550,6 +577,8 @@ window.addEventListener("load", async () => {
 
     /**
      * @summary hides the Stacks toast
+     * @param target toast to hide
+     * @param hideFor seconds to hide the toast for
      */
     const hideToast = (target: string | Element, hideFor?: number) => {
         const toast = toggleToast(target, false);
@@ -558,16 +587,26 @@ window.addEventListener("load", async () => {
 
     /**
      * @summary shows the Stacks toast
+     * @param target toast to show
+     * @param showFor seconds to show the toast for
      */
     const showToast = (target: string | Element, showFor?: number) => {
         const toast = toggleToast(target, true);
         if (showFor) setTimeout(() => hideToast(toast), showFor * 1e3);
     };
 
+    /**
+     * @summary checks if {@link EventTarget} is input-like
+     * @param elem {@link EventTarget} to check
+     */
     const isInputLike = (elem: EventTarget | null): elem is HTMLInputElement | HTMLSelectElement => {
         return [HTMLInputElement, HTMLSelectElement].some((t) => elem instanceof t);
     };
 
+    /**
+     * @summary checks if {@link EventTarget} is a checked checkbox
+     * @param elem {@link EventTarget} to check
+     */
     const isCheckedBox = (elem: EventTarget | null): elem is HTMLInputElement & { checked: true; } => {
         return elem instanceof HTMLInputElement && elem.checked;
     };
