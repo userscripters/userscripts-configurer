@@ -657,7 +657,6 @@ window.addEventListener("load", async () => {
             );
 
             const header = document.createElement("h2");
-            header.classList.add("mb8");
             header.textContent = prettifyName(userscriptName);
 
             const handlerMap = {
@@ -678,7 +677,7 @@ window.addEventListener("load", async () => {
                 const inputName = `${scriptName}-${userscriptName}-${key}`;
 
                 const options: StacksSelectOptions & StacksTextInputOptions & StacksCheckboxOptions & StacksToggleOptions = {
-                    classes: [`${scriptName}-userscript-option`, "mb12"],
+                    classes: [`${scriptName}-userscript-option`, "mb16"],
                     items: items.map((item, idx) => {
                         const { value, name, selected, ...rest } = item;
 
@@ -730,6 +729,10 @@ window.addEventListener("load", async () => {
 
                 return inputWrapper;
             });
+
+            if (!inputPromises.length) {
+                header.classList.add("mb8");
+            }
 
             this.toast ||= makeStacksToast(
                 `${scriptName}-toast`,

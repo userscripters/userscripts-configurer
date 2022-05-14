@@ -448,7 +448,6 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                         container = this.container || (this.container = document.createElement("div"));
                                         container.classList.add("".concat(scriptName, "-userscript"), "d-flex", "fd-column", "mb24");
                                         header = document.createElement("h2");
-                                        header.classList.add("mb8");
                                         header.textContent = prettifyName(userscriptName);
                                         handlerMap = {
                                             "toggle": makeStacksToggle,
@@ -472,7 +471,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                             isBool = typeof values === "boolean";
                                                             inputName = "".concat(scriptName, "-").concat(userscriptName, "-").concat(key);
                                                             options = {
-                                                                classes: ["".concat(scriptName, "-userscript-option"), "mb12"],
+                                                                classes: ["".concat(scriptName, "-userscript-option"), "mb16"],
                                                                 items: items.map(function (item, idx) {
                                                                     var value = item.value, name = item.name, selected = item.selected, rest = __rest(item, ["value", "name", "selected"]);
                                                                     return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
@@ -523,6 +522,9 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                 });
                                             });
                                         });
+                                        if (!inputPromises.length) {
+                                            header.classList.add("mb8");
+                                        }
                                         this.toast || (this.toast = makeStacksToast("".concat(scriptName, "-toast"), "Updated ".concat(scriptName, " config"), {
                                             classes: [
                                                 "".concat(scriptName, "-userscript-toast"),

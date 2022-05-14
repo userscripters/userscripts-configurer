@@ -332,7 +332,6 @@ window.addEventListener("load", async () => {
             const container = this.container || (this.container = document.createElement("div"));
             container.classList.add(`${scriptName}-userscript`, "d-flex", "fd-column", "mb24");
             const header = document.createElement("h2");
-            header.classList.add("mb8");
             header.textContent = prettifyName(userscriptName);
             const handlerMap = {
                 "toggle": makeStacksToggle,
@@ -347,7 +346,7 @@ window.addEventListener("load", async () => {
                 const isBool = typeof values === "boolean";
                 const inputName = `${scriptName}-${userscriptName}-${key}`;
                 const options = {
-                    classes: [`${scriptName}-userscript-option`, "mb12"],
+                    classes: [`${scriptName}-userscript-option`, "mb16"],
                     items: items.map((item, idx) => {
                         const { value, name, selected, ...rest } = item;
                         return {
@@ -388,6 +387,9 @@ window.addEventListener("load", async () => {
                 });
                 return inputWrapper;
             });
+            if (!inputPromises.length) {
+                header.classList.add("mb8");
+            }
             this.toast || (this.toast = makeStacksToast(`${scriptName}-toast`, `Updated ${scriptName} config`, {
                 classes: [
                     `${scriptName}-userscript-toast`,
