@@ -19,7 +19,13 @@ UserScripts Configurer is a shared configuration controller for UserScripters' u
 ### How to use
 
 Configurer is exposed as a global accessible via `UserScripters.Userscripts.Configurer`.
-To ensure the Configurer is done loading, including scripts are encouraged to listen to a `userscript-configurer-load` event on `unsafeWindow` before hooking.
+To ensure the Configurer is done loading, including scripts are encouraged to listen to a `userscript-configurer-load` event on `unsafeWindow` before hooking:
+
+```lang-ts
+unsafeWindow.addEventListener("userscript-configurer-load", () => {
+    // it is safe to hook into the configurer now
+});
+```
 
 To hook to the Configurer, call its `register` method with the name of the userscript as its single parameter:
 
