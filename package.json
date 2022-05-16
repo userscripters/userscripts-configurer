@@ -45,7 +45,7 @@
         "@types/tampermonkey": "^4.0.5",
         "@typescript-eslint/eslint-plugin": "^5.23.0",
         "@typescript-eslint/parser": "^5.23.0",
-        "@userscripters/generate-headers": "^2.12.1",
+        "@userscripters/generate-headers": "^3.2.1",
         "@userscripters/generate-readme": "^2.3.1",
         "@userscripters/generate-stackapps": "^1.2.0",
         "@userscripters/global-types": "^0.2.10",

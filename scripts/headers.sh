@@ -8,6 +8,9 @@ generate-headers tampermonkey \
     -m all meta \
     -g get set delete unsafe \
     -q "https://github.com/userscripters/storage/raw/master/dist/browser.js" \
+    -x "https://chat.meta.stackexchange.com/*" \
+    -x "https://chat.stackexchange.com/*" \
+    -x "https://stackexchange.com/*" \
     --collapse \
     --pretty
 

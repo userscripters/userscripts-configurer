@@ -1,6 +1,9 @@
 // ==UserScript==
 // @author          Oleg Valter <oleg.a.valter@gmail.com>
 // @description     One script to configure them all
+// @exclude         https://chat.meta.stackexchange.com/*
+// @exclude         https://chat.stackexchange.com/*
+// @exclude         https://stackexchange.com/*
 // @grant           GM_deleteValue
 // @grant           GM_getValue
 // @grant           GM_setValue
