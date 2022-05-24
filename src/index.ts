@@ -729,6 +729,15 @@ window.addEventListener("load", async () => {
         }
 
         /**
+         * @summary checks if a {@link UserscriptOption} is already registered
+         * @param name option name
+         */
+        has(name: string) {
+            const { options } = this;
+            return options.has(name);
+        }
+
+        /**
          * @summary registers a {@link UserscriptOption}
          * @param name option name
          * @param config configuration options
