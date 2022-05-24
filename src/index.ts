@@ -867,6 +867,15 @@ window.addEventListener("load", async () => {
         }
 
         /**
+         * @summary checks if a {@link Userscript} is already registered
+         * @param name userscript name
+         */
+        has(name: string) {
+            const { scripts } = this;
+            return scripts.has(name);
+        }
+
+        /**
          * @summary hides the configuration modal
          */
         hide() {
