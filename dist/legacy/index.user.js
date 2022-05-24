@@ -35,7 +35,7 @@
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.1.1
+// @version         1.1.2
 // ==/UserScript==
 
 "use strict";
@@ -517,6 +517,10 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         _this.options = new Map();
                         return _this;
                     }
+                    Userscript.prototype.has = function (name) {
+                        var options = this.options;
+                        return options.has(name);
+                    };
                     Userscript.prototype.option = function (name, config) {
                         this.options.set(name, new UserscriptOption(this, __assign({ name: name }, config)));
                         this.render();
@@ -608,6 +612,10 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                 }
                             });
                         });
+                    };
+                    Configurer.prototype.has = function (name) {
+                        var scripts = this.scripts;
+                        return scripts.has(name);
                     };
                     Configurer.prototype.hide = function () {
                         var _a, _b;

@@ -26,6 +26,20 @@ The method will return an instance of \`Userscript\` to which options (if any) c
 - toggle switch
 - select
 
+If you want to ensure a \`Userscript\` or an \`Option\` is registered only once, both classes have a \`has\` method that accepts a \`name\` and returns a \`boolean\`:
+
+\`\`\`lang-ts
+// ensure the script hasn't been registered
+if(!configurer.has(\"my-script\")) {
+    configurer.register(\"my-script\");
+}
+
+// ensure the option hasn't been registered
+if(!script.has(\"my-option\") {
+    script.option(\"my-option\", { type: \"text\" });
+}
+\`\`\`
+
 Option config interface (as well as the interface of the Configurer itself) is described by our [Global Types](https://github.com/userscripters/global-types) type definitions package.
 
 \`\`\`lang-ts

@@ -4,7 +4,7 @@ script posts
 
 
 <!-- thumbnail: https://i.stack.imgur.com/Rdcrd.png -->
-<!-- version: 1.1.1 -->
+<!-- version: 1.1.2 -->
 <!-- tag: script -->
 <!-- excerpt: UserScripts Configurer provides a shared UI and controls configuration options for UserScripters' userscripts. -->
 
@@ -40,6 +40,20 @@ The method will return an instance of `Userscript` to which options (if any) can
 - checkboxes
 - toggle switch
 - select
+
+If you want to ensure a `Userscript` or an `Option` is registered only once, both classes have a `has` method that accepts a `name` and returns a `boolean`:
+
+```lang-ts
+// ensure the script hasn't been registered
+if(!configurer.has("my-script")) {
+    configurer.register("my-script");
+}
+
+// ensure the option hasn't been registered
+if(!script.has("my-option") {
+    script.option("my-option", { type: "text" });
+}
+```
 
 Option config interface (as well as the interface of the Configurer itself) is described by our [Global Types](https://github.com/userscripters/global-types) type definitions package.
 
@@ -90,7 +104,7 @@ The script is licensed under the [GPL-3.0-or-later](https://spdx.org/licenses/GP
 
 ### Download
 
-Latest version: 1.1.1
+Latest version: 1.1.2
 
 [Install](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.user.js) | [Minified](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.min.user.js)
 
@@ -112,7 +126,7 @@ Supported userscript managers:
 
 | Version    | Description |
 | ---------- | ----------- |
-| 1.1.1 |             |
+| 1.1.2 |             |
 
 ## Contact
 

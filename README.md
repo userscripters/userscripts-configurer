@@ -6,7 +6,7 @@
 | Name | @userscripters/userscripts-configurer |
 | Description | One script to configure them all |
 | License | [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later) |
-| Version | 1.1.1 |
+| Version | 1.1.2 |
 
 General-purpose configurer for UserScripters projects.
 
