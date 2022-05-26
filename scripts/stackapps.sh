@@ -64,6 +64,7 @@ script.option(\"prefer-diff-view\", {
 
 //toggle option
 script.option(\"prefer-diff-view\", {
+    direction: \"left\", // aligns levers to the left of the title
     selected: true,
     title: \"Prefer diff view\",
     type: \"toggle\",
