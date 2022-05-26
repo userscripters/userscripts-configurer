@@ -339,7 +339,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                 };
                 makeStacksToggle = function (id, options) {
                     var _a;
-                    var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.selected, selected = _c === void 0 ? false : _c, title = options.title;
+                    var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.direction, direction = _c === void 0 ? "right" : _c, _d = options.selected, selected = _d === void 0 ? false : _d, title = options.title;
                     var wrapper = document.createElement("div");
                     (_a = wrapper.classList).add.apply(_a, __spreadArray(["d-flex", "ai-center", "gs8"], __read(classes), false));
                     var lbl = document.createElement("label");
@@ -355,7 +355,9 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                     var lever = document.createElement("div");
                     lever.classList.add("s-toggle-switch--indicator");
                     toggleWrapper.append(input, lever);
-                    wrapper.append(lbl, toggleWrapper);
+                    wrapper.append.apply(wrapper, __spreadArray([], __read((direction === "right" ?
+                        [lbl, toggleWrapper] :
+                        [toggleWrapper, lbl])), false));
                     return [wrapper, input];
                 };
                 makeStacksToast = function (id, text, options) {
@@ -433,7 +435,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                     }
                     UserscriptOption.prototype.render = function () {
                         return __awaiter(this, void 0, void 0, function () {
-                            var _a, config, script, handlerMap, desc, def, name, _b, items, _c, title, _d, type, values, isArr, isBool, inputName, options, _e, inputWrapper;
+                            var _a, config, script, handlerMap, desc, def, name, _b, items, _c, title, _d, type, rest, values, isArr, isBool, inputName, options, _e, inputWrapper;
                             var _this = this;
                             return __generator(this, function (_f) {
                                 switch (_f.label) {
@@ -445,22 +447,17 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                             "select": makeStacksSelect,
                                             "checkbox": makeStacksCheckbox
                                         };
-                                        desc = config.desc, def = config.def, name = config.name, _b = config.items, items = _b === void 0 ? [] : _b, _c = config.title, title = _c === void 0 ? "" : _c, _d = config.type, type = _d === void 0 ? "text" : _d;
+                                        desc = config.desc, def = config.def, name = config.name, _b = config.items, items = _b === void 0 ? [] : _b, _c = config.title, title = _c === void 0 ? "" : _c, _d = config.type, type = _d === void 0 ? "text" : _d, rest = __rest(config, ["desc", "def", "name", "items", "title", "type"]);
                                         return [4, script.load(name, def)];
                                     case 1:
                                         values = _f.sent();
                                         isArr = Array.isArray(values);
                                         isBool = typeof values === "boolean";
                                         inputName = "".concat(scriptName, "-").concat(script.name, "-").concat(name);
-                                        options = {
-                                            classes: ["".concat(scriptName, "-userscript-option"), "mb16"],
-                                            items: items.map(function (item, idx) {
+                                        options = __assign(__assign({}, rest), { classes: ["".concat(scriptName, "-userscript-option"), "mb16"], items: items.map(function (item, idx) {
                                                 var value = item.value, name = item.name, selected = item.selected, rest = __rest(item, ["value", "name", "selected"]);
                                                 return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
-                                            }),
-                                            description: desc,
-                                            title: title || prettifyName(name),
-                                        };
+                                            }), description: desc, title: title || prettifyName(name) });
                                         if (!isArr && !isBool) {
                                             options.value = values;
                                         }

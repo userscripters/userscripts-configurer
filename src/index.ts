@@ -74,6 +74,7 @@ interface StacksSelectOptions extends StacksCommonOptions {
 }
 
 interface StacksToggleOptions extends StacksCommonOptions {
+    direction?: "left" | "right";
     selected?: boolean;
     title: string;
 }
@@ -455,6 +456,7 @@ window.addEventListener("load", async () => {
     ): [HTMLDivElement, HTMLInputElement] => {
         const {
             classes = [],
+            direction = "right",
             selected = false,
             title,
         } = options;
@@ -479,7 +481,12 @@ window.addEventListener("load", async () => {
         lever.classList.add("s-toggle-switch--indicator");
 
         toggleWrapper.append(input, lever);
-        wrapper.append(lbl, toggleWrapper);
+
+        wrapper.append(...(direction === "right" ?
+            [lbl, toggleWrapper] :
+            [toggleWrapper, lbl]
+        ));
+
         return [wrapper, input];
     };
 
@@ -623,7 +630,10 @@ window.addEventListener("load", async () => {
      */
     const prettifyName = (name: string) => name.split(/[-.]/).map(scase).join(" ");
 
-    class UserscriptOption<T extends Storage | UserScripters.AsyncStorage> {
+    class UserscriptOption<
+        T extends Storage | UserScripters.AsyncStorage,
+        U extends UserScripters.UserscriptOption
+        > {
 
         /**
          * @summary container element
@@ -636,7 +646,7 @@ window.addEventListener("load", async () => {
          */
         constructor(
             private script: Userscript<T>,
-            private config: UserScripters.UserscriptOption
+            private config: U
         ) { }
 
         /**
@@ -652,7 +662,7 @@ window.addEventListener("load", async () => {
                 "checkbox": makeStacksCheckbox
             };
 
-            const { desc, def, name, items = [], title = "", type = "text" } = config;
+            const { desc, def, name, items = [], title = "", type = "text", ...rest } = config;
 
             const values = await script.load(name, def) as boolean | string | string[];
 
@@ -662,6 +672,7 @@ window.addEventListener("load", async () => {
             const inputName = `${scriptName}-${script.name}-${name}`;
 
             const options: StacksSelectOptions & StacksTextInputOptions & StacksCheckboxOptions & StacksToggleOptions = {
+                ...rest,
                 classes: [`${scriptName}-userscript-option`, "mb16"],
                 items: items.map((item, idx) => {
                     const { value, name, selected, ...rest } = item;
@@ -721,7 +732,7 @@ window.addEventListener("load", async () => {
     class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store?.default {
 
         public container?: HTMLElement;
-        private options = new Map<string, UserscriptOption<T>>();
+        private options = new Map<string, UserscriptOption<T, UserScripters.UserscriptOption>>();
         private toast?: HTMLElement;
 
         constructor(public name: string, public storage: T) {
@@ -742,7 +753,7 @@ window.addEventListener("load", async () => {
          * @param name option name
          * @param config configuration options
          */
-        option(name: string, config: Omit<UserScripters.UserscriptOption, "name">) {
+        option<U extends UserScripters.UserscriptOption>(name: string, config: Omit<U, "name">) {
             this.options.set(name, new UserscriptOption(this, { name, ...config }));
             this.render();
             return this;

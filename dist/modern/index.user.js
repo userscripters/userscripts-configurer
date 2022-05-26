@@ -237,7 +237,7 @@ window.addEventListener("load", async () => {
         return [svg, path];
     };
     const makeStacksToggle = (id, options) => {
-        const { classes = [], selected = false, title, } = options;
+        const { classes = [], direction = "right", selected = false, title, } = options;
         const wrapper = document.createElement("div");
         wrapper.classList.add("d-flex", "ai-center", "gs8", ...classes);
         const lbl = document.createElement("label");
@@ -253,7 +253,9 @@ window.addEventListener("load", async () => {
         const lever = document.createElement("div");
         lever.classList.add("s-toggle-switch--indicator");
         toggleWrapper.append(input, lever);
-        wrapper.append(lbl, toggleWrapper);
+        wrapper.append(...(direction === "right" ?
+            [lbl, toggleWrapper] :
+            [toggleWrapper, lbl]));
         return [wrapper, input];
     };
     const makeStacksToast = (id, text, options = {}) => {
@@ -331,12 +333,13 @@ window.addEventListener("load", async () => {
                 "select": makeStacksSelect,
                 "checkbox": makeStacksCheckbox
             };
-            const { desc, def, name, items = [], title = "", type = "text" } = config;
+            const { desc, def, name, items = [], title = "", type = "text", ...rest } = config;
             const values = await script.load(name, def);
             const isArr = Array.isArray(values);
             const isBool = typeof values === "boolean";
             const inputName = `${scriptName}-${script.name}-${name}`;
             const options = {
+                ...rest,
                 classes: [`${scriptName}-userscript-option`, "mb16"],
                 items: items.map((item, idx) => {
                     const { value, name, selected, ...rest } = item;
