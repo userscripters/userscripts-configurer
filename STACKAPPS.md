@@ -96,6 +96,16 @@ script.option("style", {
 });
 ```
 
+On value change, the Configurer dispatches a custom event on the registered script's `container` with the following `detail`:
+
+```lang-ts
+interface ChangeEventDetail {
+    name: string,
+    script: string,
+    value: string | boolean | string[]
+}
+```
+
 The Configurer uses a [userscript manager-agnostic storage](https://github.com/userscripters/storage) that also works with `localStorage` if manager storages are inaccessible.
 
 
