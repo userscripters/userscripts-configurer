@@ -74,6 +74,7 @@ interface StacksSelectOptions extends StacksCommonOptions {
 }
 
 interface StacksToggleOptions extends StacksCommonOptions {
+    description?: string;
     direction?: "left" | "right";
     selected?: boolean;
     title: string;
@@ -456,6 +457,7 @@ window.addEventListener("load", async () => {
     ): [HTMLDivElement, HTMLInputElement] => {
         const {
             classes = [],
+            description,
             direction = "right",
             selected = false,
             title,
@@ -468,6 +470,13 @@ window.addEventListener("load", async () => {
         lbl.classList.add("flex--item", "s-label");
         lbl.htmlFor = id;
         lbl.textContent = title;
+
+        if (description) {
+            const desc = document.createElement("p");
+            desc.classList.add("s-description", "mt2");
+            desc.textContent = description;
+            lbl.append(desc);
+        }
 
         const toggleWrapper = document.createElement("div");
         toggleWrapper.classList.add("flex--item", "s-toggle-switch");

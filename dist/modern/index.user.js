@@ -237,13 +237,19 @@ window.addEventListener("load", async () => {
         return [svg, path];
     };
     const makeStacksToggle = (id, options) => {
-        const { classes = [], direction = "right", selected = false, title, } = options;
+        const { classes = [], description, direction = "right", selected = false, title, } = options;
         const wrapper = document.createElement("div");
         wrapper.classList.add("d-flex", "ai-center", "gs8", ...classes);
         const lbl = document.createElement("label");
         lbl.classList.add("flex--item", "s-label");
         lbl.htmlFor = id;
         lbl.textContent = title;
+        if (description) {
+            const desc = document.createElement("p");
+            desc.classList.add("s-description", "mt2");
+            desc.textContent = description;
+            lbl.append(desc);
+        }
         const toggleWrapper = document.createElement("div");
         toggleWrapper.classList.add("flex--item", "s-toggle-switch");
         const input = document.createElement("input");

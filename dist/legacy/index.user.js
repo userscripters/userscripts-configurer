@@ -339,13 +339,19 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                 };
                 makeStacksToggle = function (id, options) {
                     var _a;
-                    var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.direction, direction = _c === void 0 ? "right" : _c, _d = options.selected, selected = _d === void 0 ? false : _d, title = options.title;
+                    var _b = options.classes, classes = _b === void 0 ? [] : _b, description = options.description, _c = options.direction, direction = _c === void 0 ? "right" : _c, _d = options.selected, selected = _d === void 0 ? false : _d, title = options.title;
                     var wrapper = document.createElement("div");
                     (_a = wrapper.classList).add.apply(_a, __spreadArray(["d-flex", "ai-center", "gs8"], __read(classes), false));
                     var lbl = document.createElement("label");
                     lbl.classList.add("flex--item", "s-label");
                     lbl.htmlFor = id;
                     lbl.textContent = title;
+                    if (description) {
+                        var desc = document.createElement("p");
+                        desc.classList.add("s-description", "mt2");
+                        desc.textContent = description;
+                        lbl.append(desc);
+                    }
                     var toggleWrapper = document.createElement("div");
                     toggleWrapper.classList.add("flex--item", "s-toggle-switch");
                     var input = document.createElement("input");
