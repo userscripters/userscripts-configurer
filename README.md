@@ -90,15 +90,16 @@ script.option("style", {
 });
 ```
 
-Options can be added in bulk as a record of name-config pairs via the `options` method:
+Options can be added in bulk as a record of name-config pairs via the `options` method. An optional second parameter can provide shared config options:
 
 ```lang-ts
 script.options({
     welcome: {
         def: "Welcome to Stack Overflow",
         title: "Greeting text",
-        type: "text",
     },
+}, {
+    type: "text",
 });
 ```
 
