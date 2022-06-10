@@ -1,6 +1,6 @@
 {
     "name": "@userscripters/userscripts-configurer",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "description": "One script to configure them all",
     "scripts": {
         "test": "mocha",

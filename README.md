@@ -6,7 +6,7 @@
 | Name | @userscripters/userscripts-configurer |
 | Description | One script to configure them all |
 | License | [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later) |
-| Version | 1.3.0 |
+| Version | 1.4.0 |
 
 UserScripts Configurer is a shared configuration controller for UserScripters' userscripts.
 

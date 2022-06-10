@@ -35,7 +35,7 @@
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.3.0
+// @version         1.4.0
 // ==/UserScript==
 
 "use strict";
@@ -523,12 +523,13 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         this.render();
                         return this;
                     };
-                    Userscript.prototype.options = function (configs) {
+                    Userscript.prototype.options = function (configs, common) {
                         var _this = this;
                         var opts = this.opts;
+                        var sharedConfig = common || {};
                         Object.entries(configs).forEach(function (_a) {
                             var _b = __read(_a, 2), name = _b[0], config = _b[1];
-                            opts.set(name, new UserscriptOption(_this, __assign({ name: name }, config)));
+                            opts.set(name, new UserscriptOption(_this, __assign(__assign({ name: name }, sharedConfig), config)));
                         });
                         this.render();
                         return this;
