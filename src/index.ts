@@ -729,10 +729,10 @@ window.addEventListener("load", async () => {
         }
     }
 
-    class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store?.default {
+    class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store.default {
 
         public container?: HTMLElement;
-        private options = new Map<string, UserscriptOption<T, UserScripters.UserscriptOption>>();
+        private opts = new Map<string, UserscriptOption<T, UserScripters.UserscriptOption>>();
         private toast?: HTMLElement;
 
         constructor(public name: string, public storage: T) {
@@ -744,8 +744,8 @@ window.addEventListener("load", async () => {
          * @param name option name
          */
         has(name: string) {
-            const { options } = this;
-            return options.has(name);
+            const { opts } = this;
+            return opts.has(name);
         }
 
         /**
@@ -754,7 +754,22 @@ window.addEventListener("load", async () => {
          * @param config configuration options
          */
         option<U extends UserScripters.UserscriptOption>(name: string, config: Omit<U, "name">) {
-            this.options.set(name, new UserscriptOption(this, { name, ...config }));
+            this.opts.set(name, new UserscriptOption(this, { name, ...config }));
+            this.render();
+            return this;
+        }
+
+        /**
+         * @summary registers {@link UserScriptOption}s in bulk
+         * @param configs a map of option names to config
+         */
+        options<U extends Record<string, Omit<UserScripters.UserscriptOption, "name">>>(configs: U) {
+            const { opts } = this;
+
+            Object.entries(configs).forEach(([name, config]) => {
+                opts.set(name, new UserscriptOption(this, { name, ...config }));
+            });
+
             this.render();
             return this;
         }
@@ -763,7 +778,7 @@ window.addEventListener("load", async () => {
          * @summary renders the userscript item
          */
         async render() {
-            const { name: userscriptName, options } = this;
+            const { name: userscriptName, opts } = this;
 
             const container = this.container ||= document.createElement("div");
             container.classList.add(
@@ -774,7 +789,7 @@ window.addEventListener("load", async () => {
             const header = document.createElement("h2");
             header.textContent = prettifyName(userscriptName);
 
-            const inputPromises = [...options].map(([_, option]) => option.render());
+            const inputPromises = [...opts].map(([_, option]) => option.render());
 
             if (!inputPromises.length) {
                 header.classList.add("mb8");
