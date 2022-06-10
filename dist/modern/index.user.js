@@ -1,41 +1,41 @@
 // ==UserScript==
+// @name            Userscripts Configurer
 // @author          Oleg Valter <oleg.a.valter@gmail.com>
 // @description     One script to configure them all
 // @exclude         https://chat.meta.stackexchange.com/*
 // @exclude         https://chat.stackexchange.com/*
 // @exclude         https://stackexchange.com/*
-// @grant           GM_deleteValue
 // @grant           GM_getValue
 // @grant           GM_setValue
+// @grant           GM_deleteValue
 // @grant           unsafeWindow
 // @homepage        https://github.com/userscripters/userscripts-configurer#readme
+// @match           https://stackoverflow.com/*
+// @match           https://serverfault.com/*
+// @match           https://superuser.com/*
 // @match           https://*.stackexchange.com/*
 // @match           https://askubuntu.com/*
-// @match           https://es.meta.stackoverflow.com/*
-// @match           https://es.stackoverflow.com/*
-// @match           https://ja.meta.stackoverflow.com/*
-// @match           https://ja.stackoverflow.com/*
+// @match           https://stackapps.com/*
 // @match           https://mathoverflow.net/*
+// @match           https://pt.stackoverflow.com/*
+// @match           https://ja.stackoverflow.com/*
+// @match           https://ru.stackoverflow.com/*
+// @match           https://es.stackoverflow.com/*
+// @match           https://meta.stackoverflow.com/*
+// @match           https://meta.serverfault.com/*
+// @match           https://meta.superuser.com/*
 // @match           https://meta.askubuntu.com/*
 // @match           https://meta.mathoverflow.net/*
-// @match           https://meta.serverfault.com/*
-// @match           https://meta.stackoverflow.com/*
-// @match           https://meta.superuser.com/*
 // @match           https://pt.meta.stackoverflow.com/*
-// @match           https://pt.stackoverflow.com/*
+// @match           https://ja.meta.stackoverflow.com/*
 // @match           https://ru.meta.stackoverflow.com/*
-// @match           https://ru.stackoverflow.com/*
-// @match           https://serverfault.com/*
-// @match           https://stackapps.com/*
-// @match           https://stackoverflow.com/*
-// @match           https://superuser.com/*
-// @name            Userscripts Configurer
+// @match           https://es.meta.stackoverflow.com/*
 // @namespace       userscripters
 // @require         https://github.com/userscripters/storage/raw/master/dist/browser.js
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.2.0
+// @version         1.3.0
 // ==/UserScript==
 
 "use strict";
@@ -384,29 +384,37 @@ window.addEventListener("load", async () => {
             return inputWrapper;
         }
     }
-    class Userscript extends (Store === null || Store === void 0 ? void 0 : Store.default) {
+    class Userscript extends Store.default {
         constructor(name, storage) {
             super(name, storage);
             this.name = name;
             this.storage = storage;
-            this.options = new Map();
+            this.opts = new Map();
         }
         has(name) {
-            const { options } = this;
-            return options.has(name);
+            const { opts } = this;
+            return opts.has(name);
         }
         option(name, config) {
-            this.options.set(name, new UserscriptOption(this, { name, ...config }));
+            this.opts.set(name, new UserscriptOption(this, { name, ...config }));
+            this.render();
+            return this;
+        }
+        options(configs) {
+            const { opts } = this;
+            Object.entries(configs).forEach(([name, config]) => {
+                opts.set(name, new UserscriptOption(this, { name, ...config }));
+            });
             this.render();
             return this;
         }
         async render() {
-            const { name: userscriptName, options } = this;
+            const { name: userscriptName, opts } = this;
             const container = this.container || (this.container = document.createElement("div"));
             container.classList.add(`${scriptName}-userscript`, "d-flex", "fd-column", "mb24");
             const header = document.createElement("h2");
             header.textContent = prettifyName(userscriptName);
-            const inputPromises = [...options].map(([_, option]) => option.render());
+            const inputPromises = [...opts].map(([_, option]) => option.render());
             if (!inputPromises.length) {
                 header.classList.add("mb8");
             }

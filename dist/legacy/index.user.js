@@ -1,41 +1,41 @@
 // ==UserScript==
+// @name            Userscripts Configurer
 // @author          Oleg Valter <oleg.a.valter@gmail.com>
 // @description     One script to configure them all
 // @exclude         https://chat.meta.stackexchange.com/*
 // @exclude         https://chat.stackexchange.com/*
 // @exclude         https://stackexchange.com/*
-// @grant           GM_deleteValue
 // @grant           GM_getValue
 // @grant           GM_setValue
+// @grant           GM_deleteValue
 // @grant           unsafeWindow
 // @homepage        https://github.com/userscripters/userscripts-configurer#readme
+// @match           https://stackoverflow.com/*
+// @match           https://serverfault.com/*
+// @match           https://superuser.com/*
 // @match           https://*.stackexchange.com/*
 // @match           https://askubuntu.com/*
-// @match           https://es.meta.stackoverflow.com/*
-// @match           https://es.stackoverflow.com/*
-// @match           https://ja.meta.stackoverflow.com/*
-// @match           https://ja.stackoverflow.com/*
+// @match           https://stackapps.com/*
 // @match           https://mathoverflow.net/*
+// @match           https://pt.stackoverflow.com/*
+// @match           https://ja.stackoverflow.com/*
+// @match           https://ru.stackoverflow.com/*
+// @match           https://es.stackoverflow.com/*
+// @match           https://meta.stackoverflow.com/*
+// @match           https://meta.serverfault.com/*
+// @match           https://meta.superuser.com/*
 // @match           https://meta.askubuntu.com/*
 // @match           https://meta.mathoverflow.net/*
-// @match           https://meta.serverfault.com/*
-// @match           https://meta.stackoverflow.com/*
-// @match           https://meta.superuser.com/*
 // @match           https://pt.meta.stackoverflow.com/*
-// @match           https://pt.stackoverflow.com/*
+// @match           https://ja.meta.stackoverflow.com/*
 // @match           https://ru.meta.stackoverflow.com/*
-// @match           https://ru.stackoverflow.com/*
-// @match           https://serverfault.com/*
-// @match           https://stackapps.com/*
-// @match           https://stackoverflow.com/*
-// @match           https://superuser.com/*
-// @name            Userscripts Configurer
+// @match           https://es.meta.stackoverflow.com/*
 // @namespace       userscripters
 // @require         https://github.com/userscripters/storage/raw/master/dist/browser.js
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.2.0
+// @version         1.3.0
 // ==/UserScript==
 
 "use strict";
@@ -511,31 +511,41 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         var _this = _super.call(this, name, storage) || this;
                         _this.name = name;
                         _this.storage = storage;
-                        _this.options = new Map();
+                        _this.opts = new Map();
                         return _this;
                     }
                     Userscript.prototype.has = function (name) {
-                        var options = this.options;
-                        return options.has(name);
+                        var opts = this.opts;
+                        return opts.has(name);
                     };
                     Userscript.prototype.option = function (name, config) {
-                        this.options.set(name, new UserscriptOption(this, __assign({ name: name }, config)));
+                        this.opts.set(name, new UserscriptOption(this, __assign({ name: name }, config)));
+                        this.render();
+                        return this;
+                    };
+                    Userscript.prototype.options = function (configs) {
+                        var _this = this;
+                        var opts = this.opts;
+                        Object.entries(configs).forEach(function (_a) {
+                            var _b = __read(_a, 2), name = _b[0], config = _b[1];
+                            opts.set(name, new UserscriptOption(_this, __assign({ name: name }, config)));
+                        });
                         this.render();
                         return this;
                     };
                     Userscript.prototype.render = function () {
                         return __awaiter(this, void 0, void 0, function () {
-                            var _a, userscriptName, options, container, header, inputPromises, inputs, empty;
+                            var _a, userscriptName, opts, container, header, inputPromises, inputs, empty;
                             var _this = this;
                             return __generator(this, function (_b) {
                                 switch (_b.label) {
                                     case 0:
-                                        _a = this, userscriptName = _a.name, options = _a.options;
+                                        _a = this, userscriptName = _a.name, opts = _a.opts;
                                         container = this.container || (this.container = document.createElement("div"));
                                         container.classList.add("".concat(scriptName, "-userscript"), "d-flex", "fd-column", "mb24");
                                         header = document.createElement("h2");
                                         header.textContent = prettifyName(userscriptName);
-                                        inputPromises = __spreadArray([], __read(options), false).map(function (_a) {
+                                        inputPromises = __spreadArray([], __read(opts), false).map(function (_a) {
                                             var _b = __read(_a, 2), _ = _b[0], option = _b[1];
                                             return option.render();
                                         });
@@ -570,7 +580,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         });
                     };
                     return Userscript;
-                }((Store === null || Store === void 0 ? void 0 : Store.default)));
+                }(Store.default));
                 Configurer = (function () {
                     function Configurer(storage) {
                         this.storage = storage;

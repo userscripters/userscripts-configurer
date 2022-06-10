@@ -4,7 +4,7 @@ script posts
 
 
 <!-- thumbnail: https://i.stack.imgur.com/Rdcrd.png -->
-<!-- version: 1.2.0 -->
+<!-- version: 1.3.0 -->
 <!-- tag: script -->
 <!-- excerpt: UserScripts Configurer provides a shared UI and controls configuration options for UserScripters' userscripts. -->
 
@@ -96,6 +96,18 @@ script.option("style", {
 });
 ```
 
+Options can be added in bulk as a record of name-config pairs via the `options` method:
+
+```lang-ts
+script.options({
+    welcome: {
+        def: "Welcome to Stack Overflow",
+        title: "Greeting text",
+        type: "text",
+    },
+});
+```
+
 On value change, the Configurer dispatches a custom event on the registered script's `container` with the following `detail`:
 
 ```lang-ts
@@ -115,7 +127,7 @@ The script is licensed under the [GPL-3.0-or-later](https://spdx.org/licenses/GP
 
 ### Download
 
-Latest version: 1.2.0
+Latest version: 1.3.0
 
 [Install](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.user.js) | [Minified](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.min.user.js)
 
@@ -137,7 +149,7 @@ Supported userscript managers:
 
 | Version    | Description |
 | ---------- | ----------- |
-| 1.2.0 |             |
+| 1.3.0 |             |
 
 ## Contact
 
