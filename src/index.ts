@@ -763,10 +763,15 @@ window.addEventListener("load", async () => {
          * @summary registers {@link UserScriptOption}s in bulk
          * @param configs a map of option names to config
          */
+        options<U extends Record<string, UserScripters.UserscriptOptionConfig>>(configs: U): Userscript<T>;
         options<
             U extends Record<string, UserScripters.UserscriptOptionConfig>,
             V extends Partial<UserScripters.UserscriptOptionConfig>
-        >(configs: U, common?: V) {
+            >(configs: UserScripters.UserscriptOptionConfigRecord<U, V>, common: V): Userscript<T>;
+        options<
+            U extends Record<string, UserScripters.UserscriptOptionConfig>,
+            V extends Partial<UserScripters.UserscriptOptionConfig>
+        >(configs: UserScripters.UserscriptOptionConfigRecord<U, V>, common?: V) {
             const { opts } = this;
 
             const sharedConfig = common || {};
