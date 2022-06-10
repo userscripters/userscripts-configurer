@@ -753,7 +753,7 @@ window.addEventListener("load", async () => {
          * @param name option name
          * @param config configuration options
          */
-        option<U extends UserScripters.UserscriptOption>(name: string, config: Omit<U, "name">) {
+        option<U extends UserScripters.UserscriptOptionConfig>(name: string, config: U) {
             this.opts.set(name, new UserscriptOption(this, { name, ...config }));
             this.render();
             return this;
@@ -763,11 +763,20 @@ window.addEventListener("load", async () => {
          * @summary registers {@link UserScriptOption}s in bulk
          * @param configs a map of option names to config
          */
-        options<U extends Record<string, Omit<UserScripters.UserscriptOption, "name">>>(configs: U) {
+        options<
+            U extends Record<string, UserScripters.UserscriptOptionConfig>,
+            V extends Partial<UserScripters.UserscriptOptionConfig>
+        >(configs: U, common?: V) {
             const { opts } = this;
 
+            const sharedConfig = common || {};
+
             Object.entries(configs).forEach(([name, config]) => {
-                opts.set(name, new UserscriptOption(this, { name, ...config }));
+                opts.set(name, new UserscriptOption(this, {
+                    name,
+                    ...sharedConfig,
+                    ...config
+                }));
             });
 
             this.render();
