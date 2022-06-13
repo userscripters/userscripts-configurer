@@ -35,5 +35,5 @@
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.5.0
+// @version         1.5.1
 // ==/UserScript==

@@ -4,7 +4,7 @@ script posts
 
 
 <!-- thumbnail: https://i.stack.imgur.com/Rdcrd.png -->
-<!-- version: 1.5.0 -->
+<!-- version: 1.5.1 -->
 <!-- tag: script -->
 <!-- excerpt: UserScripts Configurer provides a shared UI and controls configuration options for UserScripters' userscripts. -->
 
@@ -109,14 +109,23 @@ script.options({
 });
 ```
 
-On value change, the Configurer dispatches a custom event on the registered script's `container` with the following `detail`:
+On value change, the Configurer dispatches a custom *bubbling* event on the registered script's `container` with the following `detail`:
 
 ```lang-ts
 interface ChangeEventDetail {
     name: string,
     script: string,
-    value: string | boolean | string[]
+    oldValue: string | boolean | string[],
+    value: string | boolean | string[],
 }
+```
+
+The custom event can be listened to via the `userscript-configurer-change` event name:
+
+```lang-ts
+window.addEventListener("userscript-configurer-change", ({ detail }) => {
+    // do something with the change data
+});
 ```
 
 The Configurer uses a [userscript manager-agnostic storage](https://github.com/userscripters/storage) that also works with `localStorage` if manager storages are inaccessible.
@@ -128,7 +137,7 @@ The script is licensed under the [GPL-3.0-or-later](https://spdx.org/licenses/GP
 
 ### Download
 
-Latest version: 1.5.0
+Latest version: 1.5.1
 
 [Install](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.user.js) | [Minified](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.min.user.js)
 
@@ -150,7 +159,7 @@ Supported userscript managers:
 
 | Version    | Description |
 | ---------- | ----------- |
-| 1.5.0 |             |
+| 1.5.1 |             |
 
 ## Contact
 
