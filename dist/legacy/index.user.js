@@ -475,13 +475,16 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                         inputWrapper.addEventListener("change", function (_a) {
                                             var currentTarget = _a.currentTarget, target = _a.target;
                                             return __awaiter(_this, void 0, void 0, function () {
-                                                var actualTarget, value;
+                                                var oldValue, actualTarget, value, optionChangeEvent;
                                                 var _b;
                                                 return __generator(this, function (_c) {
                                                     switch (_c.label) {
                                                         case 0:
                                                             if (!isInputLike(target))
                                                                 return [2];
+                                                            return [4, script.load(name)];
+                                                        case 1:
+                                                            oldValue = _c.sent();
                                                             actualTarget = currentTarget instanceof HTMLFieldSetElement ?
                                                                 { value: __spreadArray([], __read(currentTarget.elements), false).filter(isCheckedBox).map(function (e) { return e.value; }) } :
                                                                 target;
@@ -489,16 +492,18 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                                                 actualTarget.checked :
                                                                 actualTarget.value;
                                                             return [4, script.save(name, value)];
-                                                        case 1:
+                                                        case 2:
                                                             _c.sent();
-                                                            (_b = script.container) === null || _b === void 0 ? void 0 : _b.dispatchEvent(new CustomEvent("".concat(scriptName, "-success"), {
+                                                            optionChangeEvent = new CustomEvent("".concat(scriptName, "-change"), {
                                                                 bubbles: true,
                                                                 detail: {
                                                                     name: name,
-                                                                    script: scriptName,
+                                                                    oldValue: oldValue,
+                                                                    script: script.name,
                                                                     value: value
                                                                 }
-                                                            }));
+                                                            });
+                                                            (_b = script.container) === null || _b === void 0 ? void 0 : _b.dispatchEvent(optionChangeEvent);
                                                             return [2];
                                                     }
                                                 });
@@ -566,7 +571,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                             ],
                                             type: "success"
                                         }));
-                                        container.addEventListener("".concat(scriptName, "-success"), function () {
+                                        container.addEventListener("".concat(scriptName, "-change"), function () {
                                             var toast = _this.toast;
                                             if (toast)
                                                 showToast(toast, 1);

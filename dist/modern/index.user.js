@@ -371,6 +371,7 @@ window.addEventListener("load", async () => {
                 var _a;
                 if (!isInputLike(target))
                     return;
+                const oldValue = await script.load(name);
                 const actualTarget = currentTarget instanceof HTMLFieldSetElement ?
                     { value: [...currentTarget.elements].filter(isCheckedBox).map((e) => e.value) } :
                     target;
@@ -378,14 +379,16 @@ window.addEventListener("load", async () => {
                     actualTarget.checked :
                     actualTarget.value;
                 await script.save(name, value);
-                (_a = script.container) === null || _a === void 0 ? void 0 : _a.dispatchEvent(new CustomEvent(`${scriptName}-success`, {
+                const optionChangeEvent = new CustomEvent(`${scriptName}-change`, {
                     bubbles: true,
                     detail: {
                         name,
-                        script: scriptName,
+                        oldValue,
+                        script: script.name,
                         value
                     }
-                }));
+                });
+                (_a = script.container) === null || _a === void 0 ? void 0 : _a.dispatchEvent(optionChangeEvent);
             });
             return inputWrapper;
         }
@@ -436,7 +439,7 @@ window.addEventListener("load", async () => {
                 ],
                 type: "success"
             }));
-            container.addEventListener(`${scriptName}-success`, () => {
+            container.addEventListener(`${scriptName}-change`, () => {
                 const { toast } = this;
                 if (toast)
                     showToast(toast, 1);

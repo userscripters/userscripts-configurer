@@ -94,14 +94,23 @@ script.options({
 });
 \`\`\`
 
-On value change, the Configurer dispatches a custom event on the registered script's \`container\` with the following \`detail\`:
+On value change, the Configurer dispatches a custom *bubbling* event on the registered script's \`container\` with the following \`detail\`:
 
 \`\`\`lang-ts
 interface ChangeEventDetail {
     name: string,
     script: string,
-    value: string | boolean | string[]
+    oldValue: string | boolean | string[],
+    value: string | boolean | string[],
 }
+\`\`\`
+
+The custom event can be listened to via the \`userscript-configurer-change\` event name:
+
+\`\`\`lang-ts
+window.addEventListener(\"userscript-configurer-change\", ({ detail }) => {
+    // do something with the change data
+});
 \`\`\`
 
 The Configurer uses a [userscript manager-agnostic storage](https://github.com/userscripters/storage) that also works with \`localStorage\` if manager storages are inaccessible.
