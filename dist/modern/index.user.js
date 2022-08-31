@@ -35,7 +35,7 @@
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.5.1
+// @version         1.6.0
 // ==/UserScript==
 
 "use strict";
@@ -508,9 +508,8 @@ window.addEventListener("load", async () => {
             const { scripts } = this;
             return scripts.get(name);
         }
-        register(name) {
-            const { storage } = this;
-            const script = new Userscript(name, storage);
+        register(name, storage) {
+            const script = new Userscript(name, storage || this.storage);
             this.scripts.set(name, script);
             this.render();
             return script;

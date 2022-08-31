@@ -35,7 +35,7 @@
 // @run-at          document-start
 // @source          git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.5.1
+// @version         1.6.0
 // ==/UserScript==
 
 "use strict";
@@ -647,9 +647,8 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         var scripts = this.scripts;
                         return scripts.get(name);
                     };
-                    Configurer.prototype.register = function (name) {
-                        var storage = this.storage;
-                        var script = new Userscript(name, storage);
+                    Configurer.prototype.register = function (name, storage) {
+                        var script = new Userscript(name, storage || this.storage);
                         this.scripts.set(name, script);
                         this.render();
                         return script;
