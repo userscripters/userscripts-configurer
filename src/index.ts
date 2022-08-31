@@ -651,10 +651,12 @@ window.addEventListener("load", async () => {
 
         /**
          * @param script containing {@link Userscript}
+         * @param name option name
          * @param config configuration options
          */
         constructor(
             private script: Userscript<T>,
+            public name: string,
             private config: U
         ) { }
 
@@ -682,7 +684,7 @@ window.addEventListener("load", async () => {
          * @summary renders the option
          */
         async render() {
-            const { config, script } = this;
+            const { config, name, script } = this;
 
             const handlerMap = {
                 "toggle": makeStacksToggle,
@@ -691,7 +693,7 @@ window.addEventListener("load", async () => {
                 "checkbox": makeStacksCheckbox
             };
 
-            const { desc, def, name, items = [], title = "", type = "text", ...rest } = config;
+            const { desc, def, disabledWhen = {}, items = [], title = "", type = "text", ...rest } = config;
 
             const values = await script.load(name, def) as boolean | string | string[];
 
@@ -796,7 +798,7 @@ window.addEventListener("load", async () => {
          * @param config configuration options
          */
         option<U extends UserScripters.UserscriptOptionConfig>(name: string, config: U) {
-            this.opts.set(name, new UserscriptOption(this, { name, ...config }));
+            this.opts.set(name, new UserscriptOption(this, name, config));
             this.render();
             return this;
         }
@@ -819,8 +821,7 @@ window.addEventListener("load", async () => {
             const sharedConfig = common || {};
 
             Object.entries(configs).forEach(([name, config]) => {
-                opts.set(name, new UserscriptOption(this, {
-                    name,
+                opts.set(name, new UserscriptOption(this, name, {
                     ...sharedConfig,
                     ...config
                 }));
