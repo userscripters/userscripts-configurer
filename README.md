@@ -90,6 +90,22 @@ script.option("style", {
 });
 ```
 
+As of version 2.0.0, options can have disabled state conditions ensuring a given option can be dynamically disabled based on the values of other options.
+To add conditions, pass a `disabledWhen` dictionary to the option config. The dictionary is keyed on option *names* with values corresponding to one of the options' values.
+When the value of the option specified in the dictionary matches the one in storage, the option the dictionary belongs to will be disabled and vice versa otherwise.
+An example option configuration looks like this:
+
+```
+// an option that will be disabled if 'prefer-diff-view' is false
+script.option("dependent", {
+    disabledWhen: {
+        ["prefer-diff-view"]: false,
+    },
+    title: "Dependent option",
+    type: "toggle",
+});
+```
+
 Options can be added in bulk as a record of name-config pairs via the `options` method. An optional second parameter can provide shared config options:
 
 ```lang-ts
