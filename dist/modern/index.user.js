@@ -1,41 +1,41 @@
 // ==UserScript==
-// @name            Userscripts Configurer
-// @author          Oleg Valter <oleg.a.valter@gmail.com>
-// @description     One script to configure them all
-// @exclude         https://chat.meta.stackexchange.com/*
-// @exclude         https://chat.stackexchange.com/*
-// @exclude         https://stackexchange.com/*
-// @grant           GM_getValue
-// @grant           GM_setValue
-// @grant           GM_deleteValue
-// @grant           unsafeWindow
-// @homepage        https://github.com/userscripters/userscripts-configurer#readme
-// @match           https://stackoverflow.com/*
-// @match           https://serverfault.com/*
-// @match           https://superuser.com/*
-// @match           https://*.stackexchange.com/*
-// @match           https://askubuntu.com/*
-// @match           https://stackapps.com/*
-// @match           https://mathoverflow.net/*
-// @match           https://pt.stackoverflow.com/*
-// @match           https://ja.stackoverflow.com/*
-// @match           https://ru.stackoverflow.com/*
-// @match           https://es.stackoverflow.com/*
-// @match           https://meta.stackoverflow.com/*
-// @match           https://meta.serverfault.com/*
-// @match           https://meta.superuser.com/*
-// @match           https://meta.askubuntu.com/*
-// @match           https://meta.mathoverflow.net/*
-// @match           https://pt.meta.stackoverflow.com/*
-// @match           https://ja.meta.stackoverflow.com/*
-// @match           https://ru.meta.stackoverflow.com/*
-// @match           https://es.meta.stackoverflow.com/*
-// @namespace       userscripters
-// @require         https://github.com/userscripters/storage/raw/master/dist/browser.js
-// @run-at          document-start
-// @source          git+https://github.com/userscripters/userscripts-configurer.git
-// @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.6.0
+// @name           Userscripts Configurer
+// @author         Oleg Valter <oleg.a.valter@gmail.com>
+// @description    One script to configure them all
+// @exclude        https://chat.meta.stackexchange.com/*
+// @exclude        https://chat.stackexchange.com/*
+// @exclude        https://stackexchange.com/*
+// @grant          GM_getValue
+// @grant          GM_setValue
+// @grant          GM_deleteValue
+// @grant          unsafeWindow
+// @homepage       https://github.com/userscripters/userscripts-configurer#readme
+// @match          https://stackoverflow.com/*
+// @match          https://serverfault.com/*
+// @match          https://superuser.com/*
+// @match          https://*.stackexchange.com/*
+// @match          https://askubuntu.com/*
+// @match          https://stackapps.com/*
+// @match          https://mathoverflow.net/*
+// @match          https://pt.stackoverflow.com/*
+// @match          https://ja.stackoverflow.com/*
+// @match          https://ru.stackoverflow.com/*
+// @match          https://es.stackoverflow.com/*
+// @match          https://meta.stackoverflow.com/*
+// @match          https://meta.serverfault.com/*
+// @match          https://meta.superuser.com/*
+// @match          https://meta.askubuntu.com/*
+// @match          https://meta.mathoverflow.net/*
+// @match          https://pt.meta.stackoverflow.com/*
+// @match          https://ja.meta.stackoverflow.com/*
+// @match          https://ru.meta.stackoverflow.com/*
+// @match          https://es.meta.stackoverflow.com/*
+// @namespace      userscripters
+// @require        https://github.com/userscripters/storage/raw/master/dist/browser.js
+// @run-at         document-start
+// @source         git+https://github.com/userscripters/userscripts-configurer.git
+// @supportURL     https://github.com/userscripters/userscripts-configurer/issues
+// @version        2.0.0
 // ==/UserScript==
 
 "use strict";
@@ -237,9 +237,10 @@ window.addEventListener("load", async () => {
         return [svg, path];
     };
     const makeStacksToggle = (id, options) => {
-        const { classes = [], description, direction = "right", selected = false, title, } = options;
+        const { classes = [], description, disabled = false, direction = "right", selected = false, title, } = options;
         const wrapper = document.createElement("div");
         wrapper.classList.add("d-flex", "ai-center", "gs8", ...classes);
+        wrapper.classList.toggle("disabled-area", disabled);
         const lbl = document.createElement("label");
         lbl.classList.add("flex--item", "s-label");
         lbl.htmlFor = id;
@@ -327,19 +328,33 @@ window.addEventListener("load", async () => {
     const scase = (text) => text.slice(0, 1).toUpperCase() + text.slice(1).toLowerCase();
     const prettifyName = (name) => name.split(/[-.]/).map(scase).join(" ");
     class UserscriptOption {
-        constructor(script, config) {
+        constructor(script, name, config) {
             this.script = script;
+            this.name = name;
             this.config = config;
         }
-        async render() {
+        async shouldDisable() {
             const { config, script } = this;
+            const conditions = Object.entries(config.disabledWhen || {});
+            for (const [name, disableValue] of conditions) {
+                const option = script.get(name);
+                if (!option)
+                    continue;
+                const value = await script.load(name, config.def);
+                if (disableValue === value)
+                    return true;
+            }
+            return false;
+        }
+        async render() {
+            const { config, name, script } = this;
             const handlerMap = {
                 "toggle": makeStacksToggle,
                 "text": makeStacksTextInput,
                 "select": makeStacksSelect,
                 "checkbox": makeStacksCheckbox
             };
-            const { desc, def, name, items = [], title = "", type = "text", ...rest } = config;
+            const { desc, def, disabledWhen = {}, items = [], title = "", type = "text", ...rest } = config;
             const values = await script.load(name, def);
             const isArr = Array.isArray(values);
             const isBool = typeof values === "boolean";
@@ -347,6 +362,7 @@ window.addEventListener("load", async () => {
             const options = {
                 ...rest,
                 classes: [`${scriptName}-userscript-option`, "mb16"],
+                disabled: await this.shouldDisable(),
                 items: items.map((item, idx) => {
                     const { value, name, selected, ...rest } = item;
                     return {
@@ -400,12 +416,16 @@ window.addEventListener("load", async () => {
             this.storage = storage;
             this.opts = new Map();
         }
+        get(name) {
+            const { opts } = this;
+            return opts.get(name);
+        }
         has(name) {
             const { opts } = this;
             return opts.has(name);
         }
         option(name, config) {
-            this.opts.set(name, new UserscriptOption(this, { name, ...config }));
+            this.opts.set(name, new UserscriptOption(this, name, config));
             this.render();
             return this;
         }
@@ -413,8 +433,7 @@ window.addEventListener("load", async () => {
             const { opts } = this;
             const sharedConfig = common || {};
             Object.entries(configs).forEach(([name, config]) => {
-                opts.set(name, new UserscriptOption(this, {
-                    name,
+                opts.set(name, new UserscriptOption(this, name, {
                     ...sharedConfig,
                     ...config
                 }));
@@ -443,6 +462,7 @@ window.addEventListener("load", async () => {
                 const { toast } = this;
                 if (toast)
                     showToast(toast, 1);
+                this.render();
             });
             const inputs = await Promise.all(inputPromises);
             clear(container);

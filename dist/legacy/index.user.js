@@ -1,41 +1,41 @@
 // ==UserScript==
-// @name            Userscripts Configurer
-// @author          Oleg Valter <oleg.a.valter@gmail.com>
-// @description     One script to configure them all
-// @exclude         https://chat.meta.stackexchange.com/*
-// @exclude         https://chat.stackexchange.com/*
-// @exclude         https://stackexchange.com/*
-// @grant           GM_getValue
-// @grant           GM_setValue
-// @grant           GM_deleteValue
-// @grant           unsafeWindow
-// @homepage        https://github.com/userscripters/userscripts-configurer#readme
-// @match           https://stackoverflow.com/*
-// @match           https://serverfault.com/*
-// @match           https://superuser.com/*
-// @match           https://*.stackexchange.com/*
-// @match           https://askubuntu.com/*
-// @match           https://stackapps.com/*
-// @match           https://mathoverflow.net/*
-// @match           https://pt.stackoverflow.com/*
-// @match           https://ja.stackoverflow.com/*
-// @match           https://ru.stackoverflow.com/*
-// @match           https://es.stackoverflow.com/*
-// @match           https://meta.stackoverflow.com/*
-// @match           https://meta.serverfault.com/*
-// @match           https://meta.superuser.com/*
-// @match           https://meta.askubuntu.com/*
-// @match           https://meta.mathoverflow.net/*
-// @match           https://pt.meta.stackoverflow.com/*
-// @match           https://ja.meta.stackoverflow.com/*
-// @match           https://ru.meta.stackoverflow.com/*
-// @match           https://es.meta.stackoverflow.com/*
-// @namespace       userscripters
-// @require         https://github.com/userscripters/storage/raw/master/dist/browser.js
-// @run-at          document-start
-// @source          git+https://github.com/userscripters/userscripts-configurer.git
-// @supportURL      https://github.com/userscripters/userscripts-configurer/issues
-// @version         1.6.0
+// @name           Userscripts Configurer
+// @author         Oleg Valter <oleg.a.valter@gmail.com>
+// @description    One script to configure them all
+// @exclude        https://chat.meta.stackexchange.com/*
+// @exclude        https://chat.stackexchange.com/*
+// @exclude        https://stackexchange.com/*
+// @grant          GM_getValue
+// @grant          GM_setValue
+// @grant          GM_deleteValue
+// @grant          unsafeWindow
+// @homepage       https://github.com/userscripters/userscripts-configurer#readme
+// @match          https://stackoverflow.com/*
+// @match          https://serverfault.com/*
+// @match          https://superuser.com/*
+// @match          https://*.stackexchange.com/*
+// @match          https://askubuntu.com/*
+// @match          https://stackapps.com/*
+// @match          https://mathoverflow.net/*
+// @match          https://pt.stackoverflow.com/*
+// @match          https://ja.stackoverflow.com/*
+// @match          https://ru.stackoverflow.com/*
+// @match          https://es.stackoverflow.com/*
+// @match          https://meta.stackoverflow.com/*
+// @match          https://meta.serverfault.com/*
+// @match          https://meta.superuser.com/*
+// @match          https://meta.askubuntu.com/*
+// @match          https://meta.mathoverflow.net/*
+// @match          https://pt.meta.stackoverflow.com/*
+// @match          https://ja.meta.stackoverflow.com/*
+// @match          https://ru.meta.stackoverflow.com/*
+// @match          https://es.meta.stackoverflow.com/*
+// @namespace      userscripters
+// @require        https://github.com/userscripters/storage/raw/master/dist/browser.js
+// @run-at         document-start
+// @source         git+https://github.com/userscripters/userscripts-configurer.git
+// @supportURL     https://github.com/userscripters/userscripts-configurer/issues
+// @version        2.0.0
 // ==/UserScript==
 
 "use strict";
@@ -136,6 +136,17 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
         }
     }
     return to.concat(ar || Array.prototype.slice.call(from));
+};
+var __values = (this && this.__values) || function(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
 ;
 ;
@@ -339,9 +350,10 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                 };
                 makeStacksToggle = function (id, options) {
                     var _a;
-                    var _b = options.classes, classes = _b === void 0 ? [] : _b, description = options.description, _c = options.direction, direction = _c === void 0 ? "right" : _c, _d = options.selected, selected = _d === void 0 ? false : _d, title = options.title;
+                    var _b = options.classes, classes = _b === void 0 ? [] : _b, description = options.description, _c = options.disabled, disabled = _c === void 0 ? false : _c, _d = options.direction, direction = _d === void 0 ? "right" : _d, _e = options.selected, selected = _e === void 0 ? false : _e, title = options.title;
                     var wrapper = document.createElement("div");
                     (_a = wrapper.classList).add.apply(_a, __spreadArray(["d-flex", "ai-center", "gs8"], __read(classes), false));
+                    wrapper.classList.toggle("disabled-area", disabled);
                     var lbl = document.createElement("label");
                     lbl.classList.add("flex--item", "s-label");
                     lbl.htmlFor = id;
@@ -435,42 +447,93 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                 scase = function (text) { return text.slice(0, 1).toUpperCase() + text.slice(1).toLowerCase(); };
                 prettifyName = function (name) { return name.split(/[-.]/).map(scase).join(" "); };
                 UserscriptOption = (function () {
-                    function UserscriptOption(script, config) {
+                    function UserscriptOption(script, name, config) {
                         this.script = script;
+                        this.name = name;
                         this.config = config;
                     }
-                    UserscriptOption.prototype.render = function () {
+                    UserscriptOption.prototype.shouldDisable = function () {
                         return __awaiter(this, void 0, void 0, function () {
-                            var _a, config, script, handlerMap, desc, def, name, _b, items, _c, title, _d, type, rest, values, isArr, isBool, inputName, options, _e, inputWrapper;
-                            var _this = this;
-                            return __generator(this, function (_f) {
-                                switch (_f.label) {
+                            var _a, config, script, conditions, conditions_1, conditions_1_1, _b, name_1, disableValue, option, value, e_1_1;
+                            var e_1, _c;
+                            return __generator(this, function (_d) {
+                                switch (_d.label) {
                                     case 0:
                                         _a = this, config = _a.config, script = _a.script;
+                                        conditions = Object.entries(config.disabledWhen || {});
+                                        _d.label = 1;
+                                    case 1:
+                                        _d.trys.push([1, 6, 7, 8]);
+                                        conditions_1 = __values(conditions), conditions_1_1 = conditions_1.next();
+                                        _d.label = 2;
+                                    case 2:
+                                        if (!!conditions_1_1.done) return [3, 5];
+                                        _b = __read(conditions_1_1.value, 2), name_1 = _b[0], disableValue = _b[1];
+                                        option = script.get(name_1);
+                                        if (!option)
+                                            return [3, 4];
+                                        return [4, script.load(name_1, config.def)];
+                                    case 3:
+                                        value = _d.sent();
+                                        if (disableValue === value)
+                                            return [2, true];
+                                        _d.label = 4;
+                                    case 4:
+                                        conditions_1_1 = conditions_1.next();
+                                        return [3, 2];
+                                    case 5: return [3, 8];
+                                    case 6:
+                                        e_1_1 = _d.sent();
+                                        e_1 = { error: e_1_1 };
+                                        return [3, 8];
+                                    case 7:
+                                        try {
+                                            if (conditions_1_1 && !conditions_1_1.done && (_c = conditions_1.return)) _c.call(conditions_1);
+                                        }
+                                        finally { if (e_1) throw e_1.error; }
+                                        return [7];
+                                    case 8: return [2, false];
+                                }
+                            });
+                        });
+                    };
+                    UserscriptOption.prototype.render = function () {
+                        return __awaiter(this, void 0, void 0, function () {
+                            var _a, config, name, script, handlerMap, desc, def, _b, disabledWhen, _c, items, _d, title, _e, type, rest, values, isArr, isBool, inputName, options, _f, _g, inputWrapper;
+                            var _h;
+                            var _this = this;
+                            return __generator(this, function (_j) {
+                                switch (_j.label) {
+                                    case 0:
+                                        _a = this, config = _a.config, name = _a.name, script = _a.script;
                                         handlerMap = {
                                             "toggle": makeStacksToggle,
                                             "text": makeStacksTextInput,
                                             "select": makeStacksSelect,
                                             "checkbox": makeStacksCheckbox
                                         };
-                                        desc = config.desc, def = config.def, name = config.name, _b = config.items, items = _b === void 0 ? [] : _b, _c = config.title, title = _c === void 0 ? "" : _c, _d = config.type, type = _d === void 0 ? "text" : _d, rest = __rest(config, ["desc", "def", "name", "items", "title", "type"]);
+                                        desc = config.desc, def = config.def, _b = config.disabledWhen, disabledWhen = _b === void 0 ? {} : _b, _c = config.items, items = _c === void 0 ? [] : _c, _d = config.title, title = _d === void 0 ? "" : _d, _e = config.type, type = _e === void 0 ? "text" : _e, rest = __rest(config, ["desc", "def", "disabledWhen", "items", "title", "type"]);
                                         return [4, script.load(name, def)];
                                     case 1:
-                                        values = _f.sent();
+                                        values = _j.sent();
                                         isArr = Array.isArray(values);
                                         isBool = typeof values === "boolean";
                                         inputName = "".concat(scriptName, "-").concat(script.name, "-").concat(name);
-                                        options = __assign(__assign({}, rest), { classes: ["".concat(scriptName, "-userscript-option"), "mb16"], items: items.map(function (item, idx) {
+                                        _f = [__assign({}, rest)];
+                                        _h = { classes: ["".concat(scriptName, "-userscript-option"), "mb16"] };
+                                        return [4, this.shouldDisable()];
+                                    case 2:
+                                        options = __assign.apply(void 0, _f.concat([(_h.disabled = _j.sent(), _h.items = items.map(function (item, idx) {
                                                 var value = item.value, name = item.name, selected = item.selected, rest = __rest(item, ["value", "name", "selected"]);
                                                 return __assign(__assign({}, rest), { name: name || "".concat(inputName, "-item-").concat(idx), selected: isArr && value !== void 0 ? values.includes(value) : selected, value: value });
-                                            }), description: desc, title: title || prettifyName(name) });
+                                            }), _h.description = desc, _h.title = title || prettifyName(name), _h)]));
                                         if (!isArr && !isBool) {
                                             options.value = values;
                                         }
                                         if (type === "toggle") {
                                             options.selected = !!values;
                                         }
-                                        _e = __read(handlerMap[type](inputName, options), 1), inputWrapper = _e[0];
+                                        _g = __read(handlerMap[type](inputName, options), 1), inputWrapper = _g[0];
                                         this.container = inputWrapper;
                                         inputWrapper.addEventListener("change", function (_a) {
                                             var currentTarget = _a.currentTarget, target = _a.target;
@@ -525,12 +588,16 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         _this.opts = new Map();
                         return _this;
                     }
+                    Userscript.prototype.get = function (name) {
+                        var opts = this.opts;
+                        return opts.get(name);
+                    };
                     Userscript.prototype.has = function (name) {
                         var opts = this.opts;
                         return opts.has(name);
                     };
                     Userscript.prototype.option = function (name, config) {
-                        this.opts.set(name, new UserscriptOption(this, __assign({ name: name }, config)));
+                        this.opts.set(name, new UserscriptOption(this, name, config));
                         this.render();
                         return this;
                     };
@@ -540,7 +607,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         var sharedConfig = common || {};
                         Object.entries(configs).forEach(function (_a) {
                             var _b = __read(_a, 2), name = _b[0], config = _b[1];
-                            opts.set(name, new UserscriptOption(_this, __assign(__assign({ name: name }, sharedConfig), config)));
+                            opts.set(name, new UserscriptOption(_this, name, __assign(__assign({}, sharedConfig), config)));
                         });
                         this.render();
                         return this;
@@ -575,6 +642,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                                             var toast = _this.toast;
                                             if (toast)
                                                 showToast(toast, 1);
+                                            _this.render();
                                         });
                                         return [4, Promise.all(inputPromises)];
                                     case 1:
