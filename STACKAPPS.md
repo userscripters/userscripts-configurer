@@ -27,12 +27,15 @@ unsafeWindow.addEventListener("userscript-configurer-load", () => {
 });
 ```
 
-To hook to the Configurer, call its `register` method with the name of the userscript as its single parameter:
+To hook to the Configurer, call its `register` method with the name of the userscript as its first parameter:
 
 ```lang-ts
 const configurer = UserScripters.Userscripts.Configurer;
 const script = configurer.register("Auto Review Comments");
 ```
+
+Since v1.6.0, the Configurer supports storage overrides if you pass a storage (either a userscript manager storage or a `localStorage`) as the second parameter to its `register` method.
+If passed, the configuration will be stored in the corresponding storage instead of the in-built Configurer storage.
 
 The method will return an instance of `Userscript` to which options (if any) can be added by calling its `option` method with 2 parameters. The 1<sup>st</sup> is the option's name, the 2<sup>nd</sup> is its configuration. The configurer currently supports 4 types of options (`type` field):
 
