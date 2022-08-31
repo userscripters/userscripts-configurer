@@ -958,11 +958,10 @@ window.addEventListener("load", async () => {
         /**
          * @summary registers a {@link Userscript}
          * @param name userscript name
+         * @param storage {@link Storage} to use
          */
-        register(name: string) {
-            const { storage } = this;
-
-            const script = new Userscript(name, storage);
+        register(name: string, storage?: T) {
+            const script = new Userscript(name, storage || this.storage);
             this.scripts.set(name, script);
             this.render();
 
