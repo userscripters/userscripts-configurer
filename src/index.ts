@@ -641,7 +641,7 @@ window.addEventListener("load", async () => {
 
     class UserscriptOption<
         T extends Storage | UserScripters.AsyncStorage,
-        U extends UserScripters.UserscriptOption
+        U extends UserScripters.UserscriptOptionConfig,
         > {
 
         /**
@@ -744,7 +744,7 @@ window.addEventListener("load", async () => {
     class Userscript<T extends Storage | UserScripters.AsyncStorage> extends Store.default {
 
         public container?: HTMLElement;
-        private opts = new Map<string, UserscriptOption<T, UserScripters.UserscriptOption>>();
+        private opts = new Map<string, UserscriptOption<T, UserScripters.UserscriptOptionConfig>>();
         private toast?: HTMLElement;
 
         constructor(public name: string, public storage: T) {
