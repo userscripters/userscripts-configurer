@@ -870,6 +870,7 @@ window.addEventListener("load", async () => {
             container.addEventListener(`${scriptName}-change`, () => {
                 const { toast } = this;
                 if (toast) showToast(toast, 1);
+                this.render();
             });
 
             const inputs = await Promise.all(inputPromises);
