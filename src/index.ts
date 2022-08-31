@@ -75,6 +75,7 @@ interface StacksSelectOptions extends StacksCommonOptions {
 
 interface StacksToggleOptions extends StacksCommonOptions {
     description?: string;
+    disabled?: boolean;
     direction?: "left" | "right";
     selected?: boolean;
     title: string;
@@ -458,6 +459,7 @@ window.addEventListener("load", async () => {
         const {
             classes = [],
             description,
+            disabled = false,
             direction = "right",
             selected = false,
             title,
@@ -465,6 +467,7 @@ window.addEventListener("load", async () => {
 
         const wrapper = document.createElement("div");
         wrapper.classList.add("d-flex", "ai-center", "gs8", ...classes);
+        wrapper.classList.toggle("disabled-area", disabled);
 
         const lbl = document.createElement("label");
         lbl.classList.add("flex--item", "s-label");
