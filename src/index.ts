@@ -659,6 +659,26 @@ window.addEventListener("load", async () => {
         ) { }
 
         /**
+         * @summary checks if the option should be disabled
+         */
+        async shouldDisable() {
+            const { config, script } = this;
+
+            const conditions = Object.entries(config.disabledWhen || {});
+
+            for (const [name, disableValue] of conditions) {
+                const option = script.get(name);
+                if (!option) continue;
+
+                const value = await script.load(name, config.def);
+
+                if (disableValue === value) return true;
+            }
+
+            return false;
+        }
+
+        /**
          * @summary renders the option
          */
         async render() {
@@ -683,6 +703,7 @@ window.addEventListener("load", async () => {
             const options: StacksSelectOptions & StacksTextInputOptions & StacksCheckboxOptions & StacksToggleOptions = {
                 ...rest,
                 classes: [`${scriptName}-userscript-option`, "mb16"],
+                disabled: await this.shouldDisable(),
                 items: items.map((item, idx) => {
                     const { value, name, selected, ...rest } = item;
 
