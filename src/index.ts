@@ -1,7 +1,11 @@
 interface StacksCommonOptions {
     classes?: string[];
-    parent?: Element;
+    parent?: Element | null;
 }
+
+type ControllerPosition = "footer" | "nav" | "sidebar";
+
+type ControllerElementFactory = (id: string, text: string, options: StacksButtonOptions) => HTMLElement;
 
 type StacksToastType =
     | "info"
@@ -79,6 +83,27 @@ interface StacksToggleOptions extends StacksCommonOptions {
     direction?: "left" | "right";
     selected?: boolean;
     title: string;
+}
+
+interface TopNavItemOptions extends StacksCommonOptions {
+    iconContent: SVGElement[];
+    linkClickable?: boolean;
+}
+
+interface SVGTextOptions extends StacksCommonOptions {
+    color?: string;
+    family?: string;
+    halign?: "start" | "middle" | "end";
+    size?: number | string;
+    text?: string;
+    valign?: "top" | "middle" | "bottom";
+    weight?: number | "bold" | "bolder" | "lighter" | "normal";
+}
+
+interface SVGRectOptions {
+    color?: string;
+    height?: number;
+    width?: number;
 }
 
 window.addEventListener("load", async () => {
@@ -642,6 +667,144 @@ window.addEventListener("load", async () => {
      */
     const prettifyName = (name: string) => name.split(/[-.]/).map(scase).join(" ");
 
+    /**
+     * @summary creates a top navigation bar item
+     * @param id item id
+     * @param text item text
+     * @param options configuration options
+     */
+    const makeTopNavItem = (id: string, text: string, options: TopNavItemOptions) => {
+        const {
+            classes = [],
+            iconContent = [],
+            linkClickable = true,
+            parent,
+        } = options;
+
+        const wrapper = document.createElement("li");
+        wrapper.classList.toggle("c-pointer", !linkClickable);
+        wrapper.id = id;
+        wrapper.setAttribute("role", "none");
+
+        const link = document.createElement(linkClickable ? "a" : "div");
+        link.classList.add("s-topbar--item", ...classes);
+        link.title = text;
+
+        const ns = "http://www.w3.org/2000/svg";
+
+        const icon = document.createElementNS(ns, "svg");
+        icon.classList.add("svg-icon", "native");
+        icon.setAttribute("height", "18");
+        icon.setAttribute("width", "18");
+        icon.setAttribute("viewBox", "0 0 18 18");
+        icon.append(...iconContent);
+
+        link.append(icon);
+        wrapper.append(link);
+        parent?.append(wrapper);
+        return wrapper;
+    };
+
+    /**
+     * @summary makes an SVG <rect> element
+     * @param top vertical starting position
+     * @param left horizontal starting position
+     * @param options configuration options
+     */
+    const makeSVGRect = (top: number, left: number, options: SVGRectOptions) => {
+        const { width = 1, height = 1, color = "black" } = options;
+
+        const ns = "http://www.w3.org/2000/svg";
+
+        const rect = document.createElementNS(ns, "rect");
+        rect.setAttribute("fill", color);
+        rect.setAttribute("height", height.toFixed(0));
+        rect.setAttribute("width", width.toFixed(0));
+        rect.setAttribute("x", left.toFixed(0));
+        rect.setAttribute("y", top.toFixed(0));
+
+        return rect;
+    };
+
+    /**
+     * @summary makes an SVG <text> element
+     * @param top vertical starting position
+     * @param left horizontal starting position
+     * @param options configuration options
+     */
+    const makeSVGText = (top: number|string, left: number|string, options: SVGTextOptions) => {
+        const {
+            classes = [],
+            color = "black",
+            halign = "start",
+            size = 12,
+            text = "",
+            valign = "top",
+            weight = "normal",
+        } = options;
+
+        const ns = "http://www.w3.org/2000/svg";
+
+        const fontSize = typeof size === "number" ? `${size.toFixed(0)}px` : size;
+        const fontWeight = typeof weight === "number" ? weight.toFixed(0) : weight;
+        const baseline = valign === "middle" ? "central" : `text-${valign}`;
+        const x = typeof left === "number" ? left.toFixed(0) : left;
+        const y = typeof top === "number" ? top.toFixed(0) : top;
+
+        const element = document.createElementNS(ns, "text");
+        element.classList.add(...classes);
+        element.setAttribute("fill", color);
+        element.setAttribute("dominant-baseline", baseline);
+        element.setAttribute("font-size", fontSize);
+        element.setAttribute("font-weight", fontWeight);
+        element.setAttribute("text-anchor", halign);
+        element.setAttribute("x", x);
+        element.setAttribute("y", y);
+        element.textContent = text;
+
+        return element;
+    };
+
+    /**
+     * @summary makes a top navigation bar item for the Configurer
+     * @param id item id
+     * @param text item text
+     * @param options configuration options
+     */
+    const makeConfigurerTopNavItem: ControllerElementFactory = (id, text, options) => {
+        const commonRectOpts: SVGRectOptions = { height: 9, width: 9, };
+
+        const topLeftRect = makeSVGRect(0, 0, { color: "#66d9ef", ...commonRectOpts, });
+        const topRightRect = makeSVGRect(0, 9, { color: "#f92342", ...commonRectOpts, });
+        const bottomRightRect = makeSVGRect(9, 9, { color: "#99e227", ...commonRectOpts, });
+        const bottomLeftRect = makeSVGRect(9, 0, { color: "#8d81ff", ...commonRectOpts, });
+
+        const commonTextOpts: SVGTextOptions = {
+            family: "Helvetica, Arial, sans-serif",
+            halign: "middle",
+            size: 5,
+            valign: "middle",
+            weight: 600,
+        };
+
+        const u = makeSVGText("25%", "25%", {color: "#f92342", text: "U", ...commonTextOpts, });
+        const s = makeSVGText("25%", "75%", {color: "#66d9ef", text: "S", ...commonTextOpts, });
+        const e = makeSVGText("75%", "25%", {color: "#99e227", text: "E", ...commonTextOpts, });
+        const r = makeSVGText("75%", "75%", {color: "#8d81ff", text: "R", ...commonTextOpts, });
+
+        return makeTopNavItem(id, text, {
+            ...options,
+            linkClickable: false,
+            iconContent: [
+                topLeftRect,
+                topRightRect,
+                bottomRightRect,
+                bottomLeftRect,
+                u, s, e, r,
+            ]
+        });
+    };
+
     class UserscriptOption<
         T extends Storage | UserScripters.AsyncStorage,
         U extends UserScripters.UserscriptOptionConfig,
@@ -888,12 +1051,94 @@ window.addEventListener("load", async () => {
         }
     }
 
+    class Controller {
+        public container?: HTMLElement;
+        private position: ControllerPosition = "sidebar";
+
+        constructor(private text: string) {}
+
+        /**
+         * @summary gets parent element for the "sidebar" position
+         */
+        get footerParent() {
+            return document.querySelector(".site-footer--categories-nav ul");
+        }
+
+        /**
+         * @summary gets parent element for the "nav" position
+         */
+        get navParent() {
+            return document.querySelector(".js-top-bar .s-topbar--content");
+        }
+
+        /**
+         * @summary gets parent element for the "sidebar" position
+         */
+        get sidebarParent() {
+            return document.body;
+        }
+
+        /**
+         * @summary gets the controller parent by position
+         */
+        get parent() {
+            const { position } = this;
+            return this[`${position}Parent`];
+        }
+
+        /**
+         * @summary sets the controller position
+         * @param position new position
+         */
+        setPosition(position: ControllerPosition) {
+            this.position = position;
+            return this;
+        }
+
+        /**
+         * @summary toggles controller state
+         */
+        toggle() {
+            this.container?.click();
+            return this;
+        }
+
+        /**
+         * @summary renders the controller button
+         */
+        async render() {
+            const controllerClasses: Partial<Record<ControllerPosition, string[]>> = {
+                footer: ["s-btn__link"],
+                sidebar: ["ps-fixed", "r0", "t128"],
+            };
+
+            const controllerBuilders: Record<ControllerPosition, ControllerElementFactory> = {
+                "footer": makeStacksButton,
+                "nav": makeConfigurerTopNavItem,
+                "sidebar": makeStacksButton,
+            };
+
+            const { parent, position, text } = this;
+
+            return this.container ||= controllerBuilders[position](
+                `${scriptName}-modal-controller`,
+                text,
+                {
+                    parent,
+                    type: "outlined",
+                    muted: true,
+                    classes: [...controllerClasses[position] || [], "bar0"]
+                }
+            );
+        }
+    }
+
     class Configurer<T extends Storage | UserScripters.AsyncStorage> {
 
         /**
-         * @summary modal controller element
+         * @summary modal controller
          */
-        private controller?: HTMLElement;
+        private controller = new Controller("UserScripters");
 
         /**
          * @summary modal element
@@ -914,37 +1159,26 @@ window.addEventListener("load", async () => {
          * @summary renders the configurer
          */
         async render() {
-            const common: StacksCommonOptions = { parent: document.body };
-            const commonClasses = ["ps-fixed", "r0"];
-
             const contentPromises = [...this.scripts].map(([_, s]) => s.render());
 
-            this.controller ||= makeStacksButton(
-                `${scriptName}-modal-controller`,
-                "UserScripters",
-                {
-                    ...common,
-                    type: "outlined",
-                    muted: true,
-                    classes: [
-                        ...commonClasses,
-                        "bar0", "t128"
-                    ]
-                }
-            );
+            const self = this.get(scriptName);
+
+            const { controller } = this;
+
+            const position = await self?.load<ControllerPosition>("button-position") || "sidebar";
+
+            controller.setPosition(position);
+
+            const controllerElement = await controller.render();
 
             this.modal ||= makeStacksExpandable(
                 `${scriptName}-modal`,
-                this.controller,
+                controllerElement,
                 {
-                    ...common,
-                    classes: [
-                        ...commonClasses,
-                        "z-modal",
-                        `${scriptName}-modal`,
-                    ],
+                    classes: ["ps-fixed", "r0", "z-modal", `${scriptName}-modal`,],
                     contentClasses: ["ba", "bar-lg", "bc-black-075", "bg-white", "p16", "wmn3"],
-                    expanded: false
+                    expanded: false,
+                    parent: document.body,
                 }
             );
 
@@ -976,7 +1210,7 @@ window.addEventListener("load", async () => {
          */
         hide() {
             if (this.modal?.classList.contains("is-expanded")) {
-                this.controller?.click();
+                this.controller?.toggle();
             }
             return this;
         }
@@ -1008,7 +1242,7 @@ window.addEventListener("load", async () => {
          */
         show() {
             if (!this.modal?.classList.contains("is-expanded")) {
-                this.controller?.click();
+                this.controller?.toggle();
             }
             return this;
         }
@@ -1039,6 +1273,20 @@ window.addEventListener("load", async () => {
     userscripts.Configurer ||= configurer;
 
     appendStyles();
+
+    configurer.register(scriptName, storage).options({
+        "button-position": {
+            def: "sidebar",
+            desc: "Changes where the \"UserScripters\" button appears in the UI",
+            items: [
+                { label: "Footer", value: "footer" },
+                { label: "Navigation", value: "nav" },
+                { label: "Sidebar", value: "sidebar" },
+            ],
+            title: "Button Placement",
+            type: "select",
+        }
+    });
 
     await configurer.render();
 
