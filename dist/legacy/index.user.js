@@ -35,7 +35,7 @@
 // @run-at         document-start
 // @source         git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL     https://github.com/userscripters/userscripts-configurer/issues
-// @version        2.1.0
+// @version        2.1.1
 // ==/UserScript==
 
 "use strict";
@@ -171,6 +171,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                         return;
                     var rules = [
                         ".".concat(scriptName, "-modal {\n                top: 20vh;\n            }"),
+                        ".".concat(scriptName, "-modal > .s-expandable--content {\n                max-height: 60vh;\n                overflow-y: auto;\n            }"),
                         ".".concat(scriptName, "-modal > .s-expandable--content:empty::after {\n                content: 'No userscripts to configure';\n            }"),
                         ".".concat(scriptName, "-userscript:last-child {\n                margin-bottom: var(--su2) !important;\n            }"),
                         ".".concat(scriptName, "-userscript-toast {\n                top: 20vh;\n                left: unset;\n            }"),

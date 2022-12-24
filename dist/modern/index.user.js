@@ -35,7 +35,7 @@
 // @run-at         document-start
 // @source         git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL     https://github.com/userscripters/userscripts-configurer/issues
-// @version        2.1.0
+// @version        2.1.1
 // ==/UserScript==
 
 "use strict";
@@ -59,6 +59,10 @@ window.addEventListener("load", async () => {
         const rules = [
             `.${scriptName}-modal {
                 top: 20vh;
+            }`,
+            `.${scriptName}-modal > .s-expandable--content {
+                max-height: 60vh;
+                overflow-y: auto;
             }`,
             `.${scriptName}-modal > .s-expandable--content:empty::after {
                 content: 'No userscripts to configure';
