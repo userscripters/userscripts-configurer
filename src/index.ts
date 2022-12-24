@@ -134,6 +134,10 @@ window.addEventListener("load", async () => {
             `.${scriptName}-modal {
                 top: 20vh;
             }`,
+            `.${scriptName}-modal > .s-expandable--content {
+                max-height: 60vh;
+                overflow-y: auto;
+            }`,
             `.${scriptName}-modal > .s-expandable--content:empty::after {
                 content: 'No userscripts to configure';
             }`,
