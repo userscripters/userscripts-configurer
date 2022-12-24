@@ -6,7 +6,7 @@
 | Name | @userscripters/userscripts-configurer |
 | Description | One script to configure them all |
 | License | [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later) |
-| Version | 2.0.0 |
+| Version | 2.1.0 |
 
 UserScripts Configurer is a shared configuration controller for UserScripters' userscripts.
 
@@ -90,6 +90,8 @@ script.option("style", {
 });
 ```
 
+---
+
 As of version 2.0.0, options can have disabled state conditions ensuring a given option can be dynamically disabled based on the values of other options.
 To add conditions, pass a `disabledWhen` dictionary to the option config. The dictionary is keyed on option *names* with values corresponding to one of the options' values.
 When the value of the option specified in the dictionary matches the one in storage, the option the dictionary belongs to will be disabled and vice versa otherwise.
@@ -137,6 +139,24 @@ window.addEventListener("userscript-configurer-change", ({ detail }) => {
     // do something with the change data
 });
 ```
+
+---
+
+As of version 2.1.0, end users can configure where the button toggling the options modal will be rendered in the UI:
+
+![configuration option for choosing the controller button position](https://i.stack.imgur.com/hSwSM.png)
+
+By default, the button is still displayed in the sidebar slightly above the expandable modal. There are 2 other options users can choose instead:
+
+1. As an icon button in the top navigation bar
+
+    ![top navigation bar icon button position](https://i.stack.imgur.com/OD9Mt.png)
+
+2. As a link button in the footer under the "Data" link in the "Stack Exchange Network" column
+
+    ![footer button position](https://i.stack.imgur.com/NrRfq.png)
+
+---
 
 The Configurer uses a [userscript manager-agnostic storage](https://github.com/userscripters/storage) that also works with `localStorage` if manager storages are inaccessible.
 

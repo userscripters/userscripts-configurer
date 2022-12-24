@@ -4,7 +4,7 @@ script posts
 
 
 <!-- thumbnail: https://i.stack.imgur.com/Rdcrd.png -->
-<!-- version: 2.0.0 -->
+<!-- version: 2.1.0 -->
 <!-- tag: script -->
 <!-- excerpt: UserScripts Configurer provides a shared UI and controls configuration options for UserScripters' userscripts. -->
 
@@ -99,6 +99,8 @@ script.option("style", {
 });
 ```
 
+---
+
 As of version 2.0.0, options can have disabled state conditions ensuring a given option can be dynamically disabled based on the values of other options.
 To add conditions, pass a `disabledWhen` dictionary to the option config. The dictionary is keyed on option *names* with values corresponding to one of the options' values.
 When the value of the option specified in the dictionary matches the one in storage, the option the dictionary belongs to will be disabled and vice versa otherwise.
@@ -147,6 +149,24 @@ window.addEventListener("userscript-configurer-change", ({ detail }) => {
 });
 ```
 
+---
+
+As of version 2.1.0, end users can configure where the button toggling the options modal will be rendered in the UI:
+
+![configuration option for choosing the controller button position](https://i.stack.imgur.com/hSwSM.png)
+
+By default, the button is still displayed in the sidebar slightly above the expandable modal. There are 2 other options users can choose instead:
+
+1. As an icon button in the top navigation bar
+
+    ![top navigation bar icon button position](https://i.stack.imgur.com/OD9Mt.png)
+
+2. As a link button in the footer under the "Data" link in the "Stack Exchange Network" column
+
+    ![footer button position](https://i.stack.imgur.com/NrRfq.png)
+
+---
+
 The Configurer uses a [userscript manager-agnostic storage](https://github.com/userscripters/storage) that also works with `localStorage` if manager storages are inaccessible.
 
 
@@ -156,7 +176,7 @@ The script is licensed under the [GPL-3.0-or-later](https://spdx.org/licenses/GP
 
 ### Download
 
-Latest version: 2.0.0
+Latest version: 2.1.0
 
 [Install](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.user.js) | [Minified](https://github.com/userscripters/userscripts-configurer/raw/master/dist/modern/index.min.user.js)
 
@@ -179,7 +199,7 @@ Supported userscript managers:
 
 | Version    | Description |
 | ---------- | ----------- |
-| 2.0.0 |             |
+| 2.1.0 |             |
 
 ## Contact
 

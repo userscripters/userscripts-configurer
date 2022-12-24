@@ -35,7 +35,7 @@
 // @run-at         document-start
 // @source         git+https://github.com/userscripters/userscripts-configurer.git
 // @supportURL     https://github.com/userscripters/userscripts-configurer/issues
-// @version        2.0.0
+// @version        2.1.0
 // ==/UserScript==
 
 "use strict";
@@ -152,7 +152,7 @@ var __values = (this && this.__values) || function(o) {
 ;
 ;
 window.addEventListener("load", function () { return __awaiter(void 0, void 0, void 0, function () {
-    var scriptName, Store, clear, appendStyles, makeStacksButton, makeStacksExpandable, makeStacksTextInput, makeStacksCheckbox, makeStacksSelect, makeStacksIcon, makeStacksToggle, makeStacksToast, toggleToast, hideToast, showToast, isInputLike, isCheckedBox, scase, prettifyName, UserscriptOption, Userscript, Configurer, userscripters, userscripts, storage, configurer;
+    var scriptName, Store, clear, appendStyles, makeStacksButton, makeStacksExpandable, makeStacksTextInput, makeStacksCheckbox, makeStacksSelect, makeStacksIcon, makeStacksToggle, makeStacksToast, toggleToast, hideToast, showToast, isInputLike, isCheckedBox, scase, prettifyName, makeTopNavItem, makeSVGRect, makeSVGText, makeConfigurerTopNavItem, UserscriptOption, Userscript, Controller, Configurer, userscripters, userscripts, storage, configurer;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -446,6 +446,85 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                 };
                 scase = function (text) { return text.slice(0, 1).toUpperCase() + text.slice(1).toLowerCase(); };
                 prettifyName = function (name) { return name.split(/[-.]/).map(scase).join(" "); };
+                makeTopNavItem = function (id, text, options) {
+                    var _a;
+                    var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.iconContent, iconContent = _c === void 0 ? [] : _c, _d = options.linkClickable, linkClickable = _d === void 0 ? true : _d, parent = options.parent;
+                    var wrapper = document.createElement("li");
+                    wrapper.classList.toggle("c-pointer", !linkClickable);
+                    wrapper.id = id;
+                    wrapper.setAttribute("role", "none");
+                    var link = document.createElement(linkClickable ? "a" : "div");
+                    (_a = link.classList).add.apply(_a, __spreadArray(["s-topbar--item"], __read(classes), false));
+                    link.title = text;
+                    var ns = "http://www.w3.org/2000/svg";
+                    var icon = document.createElementNS(ns, "svg");
+                    icon.classList.add("svg-icon", "native");
+                    icon.setAttribute("height", "18");
+                    icon.setAttribute("width", "18");
+                    icon.setAttribute("viewBox", "0 0 18 18");
+                    icon.append.apply(icon, __spreadArray([], __read(iconContent), false));
+                    link.append(icon);
+                    wrapper.append(link);
+                    parent === null || parent === void 0 ? void 0 : parent.append(wrapper);
+                    return wrapper;
+                };
+                makeSVGRect = function (top, left, options) {
+                    var _a = options.width, width = _a === void 0 ? 1 : _a, _b = options.height, height = _b === void 0 ? 1 : _b, _c = options.color, color = _c === void 0 ? "black" : _c;
+                    var ns = "http://www.w3.org/2000/svg";
+                    var rect = document.createElementNS(ns, "rect");
+                    rect.setAttribute("fill", color);
+                    rect.setAttribute("height", height.toFixed(0));
+                    rect.setAttribute("width", width.toFixed(0));
+                    rect.setAttribute("x", left.toFixed(0));
+                    rect.setAttribute("y", top.toFixed(0));
+                    return rect;
+                };
+                makeSVGText = function (top, left, options) {
+                    var _a;
+                    var _b = options.classes, classes = _b === void 0 ? [] : _b, _c = options.color, color = _c === void 0 ? "black" : _c, _d = options.halign, halign = _d === void 0 ? "start" : _d, _e = options.size, size = _e === void 0 ? 12 : _e, _f = options.text, text = _f === void 0 ? "" : _f, _g = options.valign, valign = _g === void 0 ? "top" : _g, _h = options.weight, weight = _h === void 0 ? "normal" : _h;
+                    var ns = "http://www.w3.org/2000/svg";
+                    var fontSize = typeof size === "number" ? "".concat(size.toFixed(0), "px") : size;
+                    var fontWeight = typeof weight === "number" ? weight.toFixed(0) : weight;
+                    var baseline = valign === "middle" ? "central" : "text-".concat(valign);
+                    var x = typeof left === "number" ? left.toFixed(0) : left;
+                    var y = typeof top === "number" ? top.toFixed(0) : top;
+                    var element = document.createElementNS(ns, "text");
+                    (_a = element.classList).add.apply(_a, __spreadArray([], __read(classes), false));
+                    element.setAttribute("fill", color);
+                    element.setAttribute("dominant-baseline", baseline);
+                    element.setAttribute("font-size", fontSize);
+                    element.setAttribute("font-weight", fontWeight);
+                    element.setAttribute("text-anchor", halign);
+                    element.setAttribute("x", x);
+                    element.setAttribute("y", y);
+                    element.textContent = text;
+                    return element;
+                };
+                makeConfigurerTopNavItem = function (id, text, options) {
+                    var commonRectOpts = { height: 9, width: 9, };
+                    var topLeftRect = makeSVGRect(0, 0, __assign({ color: "#66d9ef" }, commonRectOpts));
+                    var topRightRect = makeSVGRect(0, 9, __assign({ color: "#f92342" }, commonRectOpts));
+                    var bottomRightRect = makeSVGRect(9, 9, __assign({ color: "#99e227" }, commonRectOpts));
+                    var bottomLeftRect = makeSVGRect(9, 0, __assign({ color: "#8d81ff" }, commonRectOpts));
+                    var commonTextOpts = {
+                        family: "Helvetica, Arial, sans-serif",
+                        halign: "middle",
+                        size: 5,
+                        valign: "middle",
+                        weight: 600,
+                    };
+                    var u = makeSVGText("25%", "25%", __assign({ color: "#f92342", text: "U" }, commonTextOpts));
+                    var s = makeSVGText("25%", "75%", __assign({ color: "#66d9ef", text: "S" }, commonTextOpts));
+                    var e = makeSVGText("75%", "25%", __assign({ color: "#99e227", text: "E" }, commonTextOpts));
+                    var r = makeSVGText("75%", "75%", __assign({ color: "#8d81ff", text: "R" }, commonTextOpts));
+                    return makeTopNavItem(id, text, __assign(__assign({}, options), { linkClickable: false, iconContent: [
+                            topLeftRect,
+                            topRightRect,
+                            bottomRightRect,
+                            bottomLeftRect,
+                            u, s, e, r,
+                        ] }));
+                };
                 UserscriptOption = (function () {
                     function UserscriptOption(script, name, config) {
                         this.script = script;
@@ -661,37 +740,112 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                     };
                     return Userscript;
                 }(Store.default));
+                Controller = (function () {
+                    function Controller(text) {
+                        this.text = text;
+                        this.position = "sidebar";
+                    }
+                    Object.defineProperty(Controller.prototype, "footerParent", {
+                        get: function () {
+                            return document.querySelector(".site-footer--categories-nav ul");
+                        },
+                        enumerable: false,
+                        configurable: true
+                    });
+                    Object.defineProperty(Controller.prototype, "navParent", {
+                        get: function () {
+                            return document.querySelector(".js-top-bar .s-topbar--content");
+                        },
+                        enumerable: false,
+                        configurable: true
+                    });
+                    Object.defineProperty(Controller.prototype, "sidebarParent", {
+                        get: function () {
+                            return document.body;
+                        },
+                        enumerable: false,
+                        configurable: true
+                    });
+                    Object.defineProperty(Controller.prototype, "parent", {
+                        get: function () {
+                            var position = this.position;
+                            return this["".concat(position, "Parent")];
+                        },
+                        enumerable: false,
+                        configurable: true
+                    });
+                    Controller.prototype.setPosition = function (position) {
+                        this.position = position;
+                        return this;
+                    };
+                    Controller.prototype.toggle = function () {
+                        var _a;
+                        (_a = this.container) === null || _a === void 0 ? void 0 : _a.click();
+                        return this;
+                    };
+                    Controller.prototype.render = function () {
+                        return __awaiter(this, void 0, void 0, function () {
+                            var controllerClasses, controllerBuilders, _a, parent, position, text;
+                            return __generator(this, function (_b) {
+                                controllerClasses = {
+                                    footer: ["s-btn__link"],
+                                    sidebar: ["ps-fixed", "r0", "t128"],
+                                };
+                                controllerBuilders = {
+                                    "footer": makeStacksButton,
+                                    "nav": makeConfigurerTopNavItem,
+                                    "sidebar": makeStacksButton,
+                                };
+                                _a = this, parent = _a.parent, position = _a.position, text = _a.text;
+                                return [2, this.container || (this.container = controllerBuilders[position]("".concat(scriptName, "-modal-controller"), text, {
+                                        parent: parent,
+                                        type: "outlined",
+                                        muted: true,
+                                        classes: __spreadArray(__spreadArray([], __read(controllerClasses[position] || []), false), ["bar0"], false)
+                                    }))];
+                            });
+                        });
+                    };
+                    return Controller;
+                }());
                 Configurer = (function () {
                     function Configurer(storage) {
                         this.storage = storage;
+                        this.controller = new Controller("UserScripters");
                         this.scripts = new Map();
                     }
                     Configurer.prototype.render = function () {
                         return __awaiter(this, void 0, void 0, function () {
-                            var common, commonClasses, contentPromises, contentElem, content;
+                            var contentPromises, self, controller, position, controllerElement, contentElem, content;
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
-                                        common = { parent: document.body };
-                                        commonClasses = ["ps-fixed", "r0"];
                                         contentPromises = __spreadArray([], __read(this.scripts), false).map(function (_a) {
                                             var _b = __read(_a, 2), _ = _b[0], s = _b[1];
                                             return s.render();
                                         });
-                                        this.controller || (this.controller = makeStacksButton("".concat(scriptName, "-modal-controller"), "UserScripters", __assign(__assign({}, common), { type: "outlined", muted: true, classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
-                                                "bar0", "t128"
-                                            ], false) })));
-                                        this.modal || (this.modal = makeStacksExpandable("".concat(scriptName, "-modal"), this.controller, __assign(__assign({}, common), { classes: __spreadArray(__spreadArray([], __read(commonClasses), false), [
-                                                "z-modal",
-                                                "".concat(scriptName, "-modal"),
-                                            ], false), contentClasses: ["ba", "bar-lg", "bc-black-075", "bg-white", "p16", "wmn3"], expanded: false })));
+                                        self = this.get(scriptName);
+                                        controller = this.controller;
+                                        return [4, (self === null || self === void 0 ? void 0 : self.load("button-position"))];
+                                    case 1:
+                                        position = (_a.sent()) || "sidebar";
+                                        controller.setPosition(position);
+                                        return [4, controller.render()];
+                                    case 2:
+                                        controllerElement = _a.sent();
+                                        this.modal || (this.modal = makeStacksExpandable("".concat(scriptName, "-modal"), controllerElement, {
+                                            classes: ["ps-fixed", "r0", "z-modal", "".concat(scriptName, "-modal"),],
+                                            contentClasses: ["ba", "bar-lg", "bc-black-075", "bg-white", "p16", "wmn3"],
+                                            expanded: false,
+                                            parent: document.body,
+                                        }));
                                         contentElem = this.modal.querySelector(".s-expandable--content");
                                         if (!contentElem) {
                                             console.debug("[".concat(scriptName, "] missing modal content element"));
                                             return [2, this];
                                         }
                                         return [4, Promise.all(contentPromises)];
-                                    case 1:
+                                    case 3:
                                         content = _a.sent();
                                         clear(contentElem);
                                         contentElem.append.apply(contentElem, __spreadArray([], __read(content), false));
@@ -707,7 +861,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                     Configurer.prototype.hide = function () {
                         var _a, _b;
                         if ((_a = this.modal) === null || _a === void 0 ? void 0 : _a.classList.contains("is-expanded")) {
-                            (_b = this.controller) === null || _b === void 0 ? void 0 : _b.click();
+                            (_b = this.controller) === null || _b === void 0 ? void 0 : _b.toggle();
                         }
                         return this;
                     };
@@ -724,7 +878,7 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                     Configurer.prototype.show = function () {
                         var _a, _b;
                         if (!((_a = this.modal) === null || _a === void 0 ? void 0 : _a.classList.contains("is-expanded"))) {
-                            (_b = this.controller) === null || _b === void 0 ? void 0 : _b.click();
+                            (_b = this.controller) === null || _b === void 0 ? void 0 : _b.toggle();
                         }
                         return this;
                     };
@@ -745,6 +899,19 @@ window.addEventListener("load", function () { return __awaiter(void 0, void 0, v
                 configurer = new Configurer(storage);
                 userscripts.Configurer || (userscripts.Configurer = configurer);
                 appendStyles();
+                configurer.register(scriptName, storage).options({
+                    "button-position": {
+                        def: "sidebar",
+                        desc: "Changes where the \"UserScripters\" button appears in the UI",
+                        items: [
+                            { label: "Footer", value: "footer" },
+                            { label: "Navigation", value: "nav" },
+                            { label: "Sidebar", value: "sidebar" },
+                        ],
+                        title: "Button Placement",
+                        type: "select",
+                    }
+                });
                 return [4, configurer.render()];
             case 1:
                 _a.sent();
