@@ -41,7 +41,7 @@
         "@types/greasemonkey": "^4.0.7",
         "@types/jquery": "^3.5.32",
         "@types/mocha": "^10.0.9",
-        "@types/node": "^20.17.1",
+        "@types/node": "^20.17.5",
         "@types/tampermonkey": "^5.0.3",
         "@typescript-eslint/eslint-plugin": "^7.18.0",
         "@typescript-eslint/parser": "^7.18.0",
@@ -53,7 +53,7 @@
         "@userscripters/storage": "^0.1.2",
         "chai": "^5.1.2",
         "eslint": "^8.57.1",
-        "mocha": "^10.7.3",
+        "mocha": "^10.8.2",
         "ts-node": "^10.9.2",
         "typescript": "^5.6.3",
         "uglify-js": "^3.19.3"
