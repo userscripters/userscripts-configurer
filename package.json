@@ -41,7 +41,7 @@
         "@types/greasemonkey": "^4.0.7",
         "@types/jquery": "^3.5.32",
         "@types/mocha": "^10.0.10",
-        "@types/node": "^20.19.1",
+        "@types/node": "^20.19.2",
         "@types/tampermonkey": "^5.0.4",
         "@typescript-eslint/eslint-plugin": "^7.18.0",
         "@typescript-eslint/parser": "^7.18.0",
