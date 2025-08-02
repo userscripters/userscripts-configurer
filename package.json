@@ -55,7 +55,7 @@
         "eslint": "^8.57.1",
         "mocha": "^10.8.2",
         "ts-node": "^10.9.2",
-        "typescript": "^5.8.3",
+        "typescript": "^5.9.2",
         "uglify-js": "^3.19.3"
     }
 }
